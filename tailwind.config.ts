@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)"],
+        body: ["var(--font-body)"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +51,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        ember: {
+          DEFAULT: "hsl(var(--ember))",
+          glow: "hsl(var(--ember-glow))",
+        },
+        ash: "hsl(var(--ash))",
+        military: {
+          DEFAULT: "hsl(var(--military))",
+          foreground: "hsl(var(--military-foreground))",
+        },
+        steel: {
+          DEFAULT: "hsl(var(--steel))",
+          foreground: "hsl(var(--steel-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -65,25 +82,28 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "ember-float": {
+          "0%": { transform: "translateY(100vh) translateX(0) scale(1)", opacity: "0" },
+          "10%": { opacity: "1" },
+          "90%": { opacity: "0.6" },
+          "100%": { transform: "translateY(-10vh) translateX(100px) scale(0)", opacity: "0" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 20px hsl(30 95% 50% / 0.4)" },
+          "50%": { boxShadow: "0 0 35px hsl(30 95% 50% / 0.6), 0 0 90px hsl(30 95% 50% / 0.25)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
       },
     },
   },
