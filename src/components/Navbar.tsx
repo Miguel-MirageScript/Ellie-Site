@@ -6,6 +6,13 @@ const Navbar = () => {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
 
+  const linkClass = (path: string) =>
+    `hidden md:inline-block text-sm transition-colors ${
+      location.pathname === path
+        ? "text-primary font-medium"
+        : "text-muted-foreground hover:text-primary"
+    }`;
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -19,15 +26,12 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           {!isDashboard && (
             <>
-              <a href="#recursos" className="hidden md:inline-block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Recursos
-              </a>
-              <a href="#sobre" className="hidden md:inline-block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Sobre
-              </a>
+              <Link to="/" className={linkClass("/")}>Início</Link>
+              <Link to="/sobre" className={linkClass("/sobre")}>História</Link>
+              <Link to="/comandos" className={linkClass("/comandos")}>Comandos</Link>
             </>
           )}
           <Link to="/login">
