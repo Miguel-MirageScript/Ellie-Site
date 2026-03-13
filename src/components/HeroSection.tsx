@@ -4,6 +4,7 @@ import { Shield, Zap, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import gsap from "gsap";
 import heroBg from "@/assets/hero-bg.jpg";
+import ellieProfile from "@/assets/ellie-profile.jpg";
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -11,11 +12,13 @@ const HeroSection = () => {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    tl.fromTo(badgeRef.current, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
+    tl.fromTo(avatarRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8 })
+      .fromTo(badgeRef.current, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.4")
       .fromTo(titleRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.3")
       .fromTo(subtitleRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, "-=0.4")
       .fromTo(buttonsRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.3");
@@ -36,6 +39,20 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl">
+        {/* Ellie Profile Avatar */}
+        <div ref={avatarRef} className="relative mx-auto mb-6 w-40 h-40 md:w-52 md:h-52">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-primary/30 via-transparent to-transparent blur-2xl" />
+          <img
+            src={ellieProfile}
+            alt="Ellie Survivor"
+            className="relative w-full h-full object-cover rounded-full"
+            style={{
+              maskImage: "radial-gradient(circle, black 50%, transparent 75%)",
+              WebkitMaskImage: "radial-gradient(circle, black 50%, transparent 75%)",
+            }}
+          />
+        </div>
+
         <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm">
           <Shield className="h-4 w-4 text-primary" />
           <span className="text-xs font-display tracking-widest text-primary uppercase">
