@@ -4,7 +4,7 @@ import { Shield, Zap, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import gsap from "gsap";
 import heroBg from "@/assets/hero-bg.jpg";
-import ellieProfile from "@/assets/ellie-profile.jpg";
+import ellieProfile from "@/assets/ellie-profile.png";
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
