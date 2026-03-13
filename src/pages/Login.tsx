@@ -28,7 +28,7 @@ const Login = () => {
             className="w-full glow-button bg-[hsl(235,86%,65%)] hover:bg-[hsl(235,86%,60%)] text-foreground font-display tracking-wider gap-3 py-6 text-sm"
             onClick={() => {
               // TODO: Integrar Discord OAuth2 real
-              window.location.href = '/dashboard';
+              window.location.href = '/select-server';
             }}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
