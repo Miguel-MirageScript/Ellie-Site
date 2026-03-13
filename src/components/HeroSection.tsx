@@ -39,16 +39,18 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl">
-        {/* Ellie Profile Avatar */}
-        <div ref={avatarRef} className="relative mx-auto mb-6 w-40 h-40 md:w-52 md:h-52">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-primary/30 via-transparent to-transparent blur-2xl" />
+        {/* Ellie Profile Image - full portrait with edge fade */}
+        <div ref={avatarRef} className="relative mx-auto mb-6 w-64 md:w-80 lg:w-96">
+          <div className="absolute -inset-8 bg-gradient-to-b from-primary/10 via-transparent to-transparent blur-3xl pointer-events-none" />
           <img
             src={ellieProfile}
             alt="Ellie Survivor"
-            className="relative w-full h-full object-cover rounded-full"
+            className="relative w-full h-auto object-contain"
             style={{
-              maskImage: "radial-gradient(circle, black 50%, transparent 75%)",
-              WebkitMaskImage: "radial-gradient(circle, black 50%, transparent 75%)",
+              maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+              maskComposite: "intersect",
+              WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+              WebkitMaskComposite: "source-in",
             }}
           />
         </div>
