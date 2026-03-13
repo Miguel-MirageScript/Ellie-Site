@@ -53,7 +53,7 @@ const HeroSection = () => {
           />
         </div>
 
-
+        <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm">
           <Shield className="h-4 w-4 text-primary" />
           <span className="text-xs font-display tracking-widest text-primary uppercase">
             Bot de Gerenciamento para Servidores de Jogos
