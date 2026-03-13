@@ -39,7 +39,21 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl">
-        <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm">
+        {/* Ellie Profile Avatar */}
+        <div ref={avatarRef} className="relative mx-auto mb-6 w-40 h-40 md:w-52 md:h-52">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-primary/30 via-transparent to-transparent blur-2xl" />
+          <img
+            src={ellieProfile}
+            alt="Ellie Survivor"
+            className="relative w-full h-full object-cover rounded-full"
+            style={{
+              maskImage: "radial-gradient(circle, black 50%, transparent 75%)",
+              WebkitMaskImage: "radial-gradient(circle, black 50%, transparent 75%)",
+            }}
+          />
+        </div>
+
+
           <Shield className="h-4 w-4 text-primary" />
           <span className="text-xs font-display tracking-widest text-primary uppercase">
             Bot de Gerenciamento para Servidores de Jogos
