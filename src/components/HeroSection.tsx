@@ -76,12 +76,12 @@ const HeroSection = () => {
         </p>
 
         <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/login">
+          <a href="https://discord.com/oauth2/authorize?client_id=1481478930505666700&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
             <Button size="lg" className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 px-8 py-6 text-sm animate-pulse-glow">
               <Zap className="h-5 w-5" />
               COMEÇAR AGORA
             </Button>
-          </Link>
+          </a>
           <a href="#recursos">
             <Button size="lg" variant="outline" className="font-display tracking-wider gap-2 px-8 py-6 text-sm border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5">
               VER RECURSOS
