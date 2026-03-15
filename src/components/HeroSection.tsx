@@ -58,7 +58,7 @@ const HeroSection = () => {
         <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm">
           <Shield className="h-4 w-4 text-primary" />
           <span className="text-xs font-display tracking-widest text-primary uppercase">
-            Bot de Gerenciamento para Servidores de Jogos
+            Seu Bot de Gerenciamento para Servidores de Jogos
           </span>
         </div>
 
@@ -72,19 +72,19 @@ const HeroSection = () => {
           A solução definitiva para <span className="text-foreground font-semibold">moderação</span>,{" "}
           <span className="text-foreground font-semibold">tradução</span> e{" "}
           <span className="text-foreground font-semibold">anúncios</span> nos seus servidores de jogos.
-          Last Shelter Survival, FPS, Estratégia e Sobrevivência.
+          Last Shelter Survival, FPS, Estratégia e Entre outros.
         </p>
 
         <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="https://discord.com/oauth2/authorize?client_id=1481478930505666700&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
             <Button size="lg" className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 px-8 py-6 text-sm animate-pulse-glow">
               <Zap className="h-5 w-5" />
-              COMEÇAR AGORA
+              ME ADICIONE!
             </Button>
           </a>
           <a href="#recursos">
             <Button size="lg" variant="outline" className="font-display tracking-wider gap-2 px-8 py-6 text-sm border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5">
-              VER RECURSOS
+              SAIBA MAIS
             </Button>
           </a>
         </div>
