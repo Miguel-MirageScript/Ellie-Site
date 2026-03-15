@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  Bot, Server, LogOut, Eye, Languages, Megaphone, Gavel,
-  Shield, Users, Hash, Menu, Plus, Trash2, Settings,
+  Bot, Server, LogOut, Eye, Globe, Megaphone, Shield,
+  Users, Hash, Menu, Plus, Trash2, Clock, Crosshair,
+  Zap, AlertTriangle, MessageSquare, Send, Flag,
+  Swords, Target, Timer, Skull, ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -15,90 +18,114 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import EmberParticles from "@/components/EmberParticles";
 
-const mockServers: Record<string, { name: string; icon: string; members: number; online: number }> = {
-  "1": { name: "Last Shelter - Estado 999", icon: "🏰", members: 1234, online: 342 },
-  "2": { name: "FPS Competitivo BR", icon: "🔫", members: 567, online: 89 },
-  "3": { name: "Survival World", icon: "🌍", members: 890, online: 201 },
-  "4": { name: "Strategy Alliance", icon: "⚔️", members: 2100, online: 410 },
+/* ──────────────────── MOCK DATA ──────────────────── */
+
+const serverInfo = {
+  name: "Last Shelter - State 999",
+  icon: "🏰",
+  members: 3847,
+  online: 612,
 };
 
-const availableLanguages = [
-  { key: "pt", label: "Português", flag: "🇧🇷" },
-  { key: "en", label: "Inglês", flag: "🇺🇸" },
-  { key: "es", label: "Espanhol", flag: "🇪🇸" },
-  { key: "ru", label: "Russo", flag: "🇷🇺" },
-  { key: "fr", label: "Francês", flag: "🇫🇷" },
-  { key: "de", label: "Alemão", flag: "🇩🇪" },
-  { key: "zh", label: "Chinês", flag: "🇨🇳" },
-  { key: "ja", label: "Japonês", flag: "🇯🇵" },
+const moduleStatuses = [
+  { name: "Sistema de Tradução", active: true },
+  { name: "Last Shelter Intelligence", active: true },
+  { name: "Comunicação Global", active: true },
+  { name: "Moderação Tática", active: false },
+  { name: "Alertas de Eventos", active: true },
 ];
 
-type Tab = "overview" | "translation" | "announcements" | "moderation";
+const timeZoneData = [
+  { zone: "Américas", pct: 55, color: "hsl(30 95% 50%)" },
+  { zone: "Europa", pct: 28, color: "hsl(25 100% 55%)" },
+  { zone: "Ásia", pct: 17, color: "hsl(0 0% 50%)" },
+];
+
+const cozDays = [
+  { day: "Dia 1 — Build", points: "500K", active: true },
+  { day: "Dia 2 — Research", points: "400K", active: false },
+  { day: "Dia 3 — Train", points: "600K", active: true },
+  { day: "Dia 4 — Kill Event", points: "1M", active: true },
+];
+
+const gameTimers = [
+  { event: "Ataque Zumbi", time: "02:45:12", icon: <Skull className="h-4 w-4" /> },
+  { event: "Bunker", time: "08:15:30", icon: <Target className="h-4 w-4" /> },
+  { event: "Doomsday Reset", time: "1d 04:22:00", icon: <Timer className="h-4 w-4" /> },
+  { event: "Próximo CoZ", time: "3d 12:00:00", icon: <Swords className="h-4 w-4" /> },
+];
+
+const reactionFlags = [
+  { emoji: "🇧🇷", lang: "Português", active: true },
+  { emoji: "🇺🇸", lang: "Inglês", active: true },
+  { emoji: "🇪🇸", lang: "Espanhol", active: true },
+  { emoji: "🇷🇺", lang: "Russo", active: false },
+  { emoji: "🇫🇷", lang: "Francês", active: false },
+  { emoji: "🇩🇪", lang: "Alemão", active: false },
+  { emoji: "🇨🇳", lang: "Chinês", active: false },
+  { emoji: "🇯🇵", lang: "Japonês", active: false },
+];
+
+const channels = [
+  { id: "general", name: "#geral" },
+  { id: "announcements", name: "#anúncios" },
+  { id: "alliance", name: "#aliança" },
+  { id: "war-room", name: "#sala-de-guerra" },
+];
+
+const autoRoles = [
+  { id: "member", name: "Membro" },
+  { id: "recruit", name: "Recruta" },
+  { id: "visitor", name: "Visitante" },
+];
+
+/* ──────────────────── TYPES ──────────────────── */
+
+type Tab = "overview" | "lss" | "communication" | "moderation";
 
 const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "overview", label: "Visão Geral", icon: <Eye className="h-4 w-4" /> },
-  { key: "translation", label: "Sistema de Tradução", icon: <Languages className="h-4 w-4" /> },
-  { key: "announcements", label: "Anúncios", icon: <Megaphone className="h-4 w-4" /> },
-  { key: "moderation", label: "Moderação", icon: <Gavel className="h-4 w-4" /> },
+  { key: "lss", label: "LSS Intelligence", icon: <Crosshair className="h-4 w-4" /> },
+  { key: "communication", label: "Comunicação", icon: <Globe className="h-4 w-4" /> },
+  { key: "moderation", label: "Moderação", icon: <Shield className="h-4 w-4" /> },
 ];
 
-interface LanguageEntry {
-  key: string;
-  label: string;
-  flag: string;
-  roleId: string;
-}
+/* ──────────────────── COMPONENT ──────────────────── */
 
 const Dashboard = () => {
-  const [searchParams] = useSearchParams();
-  const serverId = searchParams.get("server") || "1";
-  const server = mockServers[serverId];
-
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Translation state
-  const [addedLanguages, setAddedLanguages] = useState<LanguageEntry[]>([
-    { key: "pt", label: "Português", flag: "🇧🇷", roleId: "110023456789012345" },
-    { key: "en", label: "Inglês", flag: "🇺🇸", roleId: "220034567890123456" },
-  ]);
-  const [selectedLang, setSelectedLang] = useState("");
-  const [langRoleId, setLangRoleId] = useState("");
+  // LSS State
+  const [cozChestReminder, setCozChestReminder] = useState(true);
+  const [killEventAlert, setKillEventAlert] = useState(true);
+  const [doomsdayTargets, setDoomsdayTargets] = useState("Setor 7, Setor 12");
+  const [safeZone, setSafeZone] = useState("Base Alpha");
 
-  // Announcements state
-  const [logChannelId, setLogChannelId] = useState("");
-  const [welcomeChannelId, setWelcomeChannelId] = useState("");
-
-  // Moderation toggles
-  const [autoFilter, setAutoFilter] = useState(true);
-  const [autoMod, setAutoMod] = useState(false);
-
-  const handleAddLanguage = () => {
-    if (!selectedLang || !langRoleId) return;
-    const lang = availableLanguages.find((l) => l.key === selectedLang);
-    if (!lang || addedLanguages.some((l) => l.key === selectedLang)) return;
-    setAddedLanguages((prev) => [...prev, { ...lang, roleId: langRoleId }]);
-    setSelectedLang("");
-    setLangRoleId("");
-  };
-
-  const handleRemoveLanguage = (key: string) => {
-    setAddedLanguages((prev) => prev.filter((l) => l.key !== key));
-  };
-
-  const remainingLanguages = availableLanguages.filter(
-    (l) => !addedLanguages.some((a) => a.key === l.key)
+  // Communication State
+  const [reactionTranslations, setReactionTranslations] = useState(
+    reactionFlags.map((f) => ({ ...f }))
   );
+  const [announcementText, setAnnouncementText] = useState("");
+  const [announcementChannel, setAnnouncementChannel] = useState("");
+
+  // Moderation State
+  const [blockedWords, setBlockedWords] = useState("spam, hack, cheat");
+  const [antiSpam, setAntiSpam] = useState(true);
+  const [antiFlood, setAntiFlood] = useState(true);
+  const [antiLink, setAntiLink] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState(
+    "⚔️ Bem-vindo(a) ao Last Shelter, soldado {user}! Leia as regras em #regras."
+  );
+  const [autoRole, setAutoRole] = useState("member");
+
+  const toggleReactionFlag = (emoji: string) => {
+    setReactionTranslations((prev) =>
+      prev.map((f) => (f.emoji === emoji ? { ...f, active: !f.active } : f))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
@@ -122,18 +149,17 @@ const Dashboard = () => {
             </Link>
             <span className="text-muted-foreground/40">/</span>
             <div className="flex items-center gap-2">
-              <Server className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs font-medium text-foreground">{server?.name}</span>
+              <span className="text-xl">{serverInfo.icon}</span>
+              <span className="text-xs font-medium text-foreground font-display tracking-wide">
+                {serverInfo.name}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/select-server">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground text-xs"
-              >
-                Trocar Servidor
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs gap-1.5">
+                <Server className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Trocar Servidor</span>
               </Button>
             </Link>
             <Link to="/">
@@ -150,7 +176,7 @@ const Dashboard = () => {
         <aside
           className={`${
             sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          } fixed lg:relative z-30 lg:z-auto w-56 h-[calc(100vh-3.5rem)] bg-background/70 backdrop-blur-xl border-r border-border/50 transition-transform duration-300 flex-shrink-0 flex flex-col`}
+          } fixed lg:relative z-30 lg:z-auto w-60 h-[calc(100vh-3.5rem)] bg-background/70 backdrop-blur-xl border-r border-border/50 transition-transform duration-300 flex-shrink-0 flex flex-col`}
         >
           <div className="p-4 border-b border-border/30">
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-display tracking-widest">
@@ -174,7 +200,8 @@ const Dashboard = () => {
                 }`}
               >
                 {item.icon}
-                {item.label.toUpperCase()}
+                <span className="flex-1 text-left">{item.label.toUpperCase()}</span>
+                {activeTab === item.key && <ChevronRight className="h-3 w-3 text-primary/60" />}
               </button>
             ))}
           </nav>
@@ -182,6 +209,10 @@ const Dashboard = () => {
           <div className="p-4 border-t border-border/30">
             <div className="text-[10px] text-muted-foreground/50 font-mono">
               ELLIE v2.4.1 // SISTEMA ONLINE
+            </div>
+            <div className="mt-1 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] text-green-500/80 font-mono">OPERACIONAL</span>
             </div>
           </div>
         </aside>
@@ -195,266 +226,347 @@ const Dashboard = () => {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          {/* ───── OVERVIEW ───── */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          {/* ═══════════════ OVERVIEW ═══════════════ */}
           {activeTab === "overview" && (
-            <div>
-              <h2 className="font-display text-xl font-bold tracking-wider mb-6 text-foreground">
-                VISÃO <span className="text-gradient-ember">GERAL</span>
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-                <StatCard icon={<Users className="h-5 w-5" />} label="Membros" value={server?.members.toString() || "0"} />
-                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value={server?.online.toString() || "0"} />
-                <StatCard icon={<Languages className="h-5 w-5" />} label="Idiomas Ativos" value={addedLanguages.length.toString()} />
+            <div className="space-y-6">
+              {/* Server Header */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <div className="flex items-center gap-4">
+                  <span className="text-4xl">{serverInfo.icon}</span>
+                  <div>
+                    <h2 className="font-display text-lg font-bold tracking-wider text-foreground">
+                      {serverInfo.name}
+                    </h2>
+                    <p className="text-xs text-muted-foreground font-display tracking-wider mt-1">
+                      SERVIDOR GERENCIADO POR ELLIE SURVIVOR
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <h3 className="font-display text-sm font-semibold tracking-wider text-muted-foreground mb-4">
-                SERVIDORES DISPONÍVEIS
-              </h3>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {Object.entries(mockServers).map(([id, s]) => (
-                  <Link
-                    key={id}
-                    to={`/dashboard?server=${id}`}
-                    className={`card-apocalyptic bg-background/60 backdrop-blur-md p-5 text-left hover:border-primary/30 transition-all ${
-                      id === serverId ? "border-primary/40" : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">{s.icon}</span>
-                      <span className="font-display text-xs font-semibold tracking-wide text-foreground">
-                        {s.name}
-                      </span>
+              {/* Metric Cards */}
+              <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value="3.847" accent />
+                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value="612" />
+                <StatCard icon={<Globe className="h-5 w-5" />} label="Idiomas Ativos" value="3" />
+                <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value="142" />
+              </div>
+
+              {/* Alliance Time Zones Chart */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
+                  FUSOS HORÁRIOS DA ALIANÇA
+                </h3>
+                <div className="space-y-4">
+                  {timeZoneData.map((tz) => (
+                    <div key={tz.zone}>
+                      <div className="flex justify-between text-xs mb-1.5">
+                        <span className="text-foreground font-display tracking-wider">{tz.zone.toUpperCase()}</span>
+                        <span className="text-primary font-mono">{tz.pct}%</span>
+                      </div>
+                      <div className="w-full h-3 rounded-full bg-muted/40 overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-1000"
+                          style={{
+                            width: `${tz.pct}%`,
+                            background: `linear-gradient(90deg, ${tz.color}, ${tz.color}88)`,
+                            boxShadow: `0 0 12px ${tz.color}66`,
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex gap-4 text-xs text-muted-foreground">
-                      <span>{s.members} membros</span>
-                      <span className="text-primary">{s.online} online</span>
+                  ))}
+                </div>
+                {/* Donut visual */}
+                <div className="flex items-center justify-center mt-6">
+                  <div className="relative w-32 h-32">
+                    <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 14%)" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(30 95% 50%)" strokeWidth="3"
+                        strokeDasharray="55 45" strokeDashoffset="0" className="drop-shadow-[0_0_6px_hsl(30_95%_50%_/_0.6)]" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(25 100% 55%)" strokeWidth="3"
+                        strokeDasharray="28 72" strokeDashoffset="-55" className="drop-shadow-[0_0_6px_hsl(25_100%_55%_/_0.6)]" />
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 50%)" strokeWidth="3"
+                        strokeDasharray="17 83" strokeDashoffset="-83" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="font-display text-xs text-primary font-bold">3 ZONAS</span>
                     </div>
-                  </Link>
-                ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Module Status */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
+                  STATUS DOS MÓDULOS
+                </h3>
+                <div className="space-y-3">
+                  {moduleStatuses.map((mod) => (
+                    <div key={mod.name} className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/10 px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <span className={`h-2 w-2 rounded-full ${mod.active ? "bg-green-500 shadow-[0_0_8px_hsl(120_60%_50%_/_0.5)]" : "bg-muted-foreground/40"}`} />
+                        <span className="text-xs font-display tracking-wider text-foreground">{mod.name.toUpperCase()}</span>
+                      </div>
+                      <Switch checked={mod.active} />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* ───── TRANSLATION SYSTEM ───── */}
-          {activeTab === "translation" && (
-            <div className="max-w-3xl">
+          {/* ═══════════════ LSS INTELLIGENCE ═══════════════ */}
+          {activeTab === "lss" && (
+            <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
-                <Settings className="h-5 w-5 text-primary" />
+                <Crosshair className="h-5 w-5 text-primary" />
                 <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  SISTEMA DE <span className="text-gradient-ember">TRADUÇÃO</span>
+                  LAST SHELTER <span className="text-gradient-ember">INTELLIGENCE</span>
                 </h2>
               </div>
-              <p className="text-sm text-muted-foreground mb-8">
-                Selecione o idioma e cole o Role ID correspondente no Discord.
-              </p>
 
-              {/* Add language form */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6 md:p-8 mb-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
-                  ADICIONAR IDIOMA
+              {/* CoZ Configuration */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <Swords className="h-3.5 w-3.5 text-primary" />
+                  CLASH OF ZONES (COZ) — CONFIGURAÇÃO
                 </h3>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Select value={selectedLang} onValueChange={setSelectedLang}>
-                    <SelectTrigger className="sm:w-52 bg-muted/50 border-border/60 text-foreground backdrop-blur-sm">
-                      <SelectValue placeholder="Selecionar idioma" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      {remainingLanguages.map((lang) => (
-                        <SelectItem key={lang.key} value={lang.key}>
-                          <span className="flex items-center gap-2">
-                            <span>{lang.flag}</span> {lang.label}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {cozDays.map((d) => (
+                    <div key={d.day} className={`rounded-lg border px-4 py-3 ${d.active ? "border-primary/30 bg-primary/5" : "border-border/40 bg-muted/10"}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-display tracking-wider text-foreground">{d.day.toUpperCase()}</span>
+                        <span className="text-xs font-mono text-primary">{d.points}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="section-divider my-5" />
+                <div className="space-y-4">
+                  <ToggleRow label="Lembrete de Baú" desc="Envia alerta quando baús CoZ estiverem disponíveis." checked={cozChestReminder} onChange={setCozChestReminder} />
+                  <ToggleRow label="Alerta Kill Event" desc="Notifica membros antes do dia de Kill Event." checked={killEventAlert} onChange={setKillEventAlert} />
+                </div>
+              </div>
 
-                  <Input
-                    placeholder="Role ID (ex: 123456789012345678)"
-                    value={langRoleId}
-                    onChange={(e) => setLangRoleId(e.target.value)}
-                    className="flex-1 bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm"
-                  />
+              {/* Doomsday / Eden */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <AlertTriangle className="h-3.5 w-3.5 text-primary" />
+                  DOOMSDAY / EDEN — CONFIGURAÇÃO
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">ALVOS PRIORITÁRIOS</Label>
+                    <Input
+                      value={doomsdayTargets}
+                      onChange={(e) => setDoomsdayTargets(e.target.value)}
+                      className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">ZONA SEGURA</Label>
+                    <Input
+                      value={safeZone}
+                      onChange={(e) => setSafeZone(e.target.value)}
+                      className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm"
+                    />
+                  </div>
+                </div>
+              </div>
 
+              {/* Game Event Timers */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <Clock className="h-3.5 w-3.5 text-primary" />
+                  TEMPORIZADORES DE EVENTOS
+                </h3>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {gameTimers.map((t) => (
+                    <div key={t.event} className="rounded-lg border border-border/40 bg-muted/10 px-4 py-4 flex items-center gap-4">
+                      <div className="text-primary">{t.icon}</div>
+                      <div className="flex-1">
+                        <span className="text-xs font-display tracking-wider text-foreground block">{t.event.toUpperCase()}</span>
+                        <span className="text-lg font-mono text-primary font-bold">{t.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══════════════ GLOBAL COMMUNICATION ═══════════════ */}
+          {activeTab === "communication" && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Globe className="h-5 w-5 text-primary" />
+                <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
+                  COMUNICAÇÃO <span className="text-gradient-ember">GLOBAL</span>
+                </h2>
+              </div>
+
+              {/* Reaction Translation */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
+                  <Flag className="h-3.5 w-3.5 text-primary" />
+                  TRADUÇÃO POR REAÇÃO
+                </h3>
+                <p className="text-xs text-muted-foreground mb-5">
+                  A tradução <strong className="text-foreground">NÃO</strong> é automática. Ela é ativada quando alguém reage a uma mensagem com o emoji de bandeira correspondente.
+                </p>
+                <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+                  {reactionTranslations.map((flag) => (
+                    <button
+                      key={flag.emoji}
+                      onClick={() => toggleReactionFlag(flag.emoji)}
+                      className={`rounded-lg border px-4 py-3 text-center transition-all duration-200 ${
+                        flag.active
+                          ? "border-primary/40 bg-primary/10 shadow-[0_0_15px_hsl(30_95%_50%_/_0.15)]"
+                          : "border-border/40 bg-muted/10 opacity-50 hover:opacity-75"
+                      }`}
+                    >
+                      <span className="text-2xl block mb-1">{flag.emoji}</span>
+                      <span className="text-[10px] font-display tracking-wider text-foreground">{flag.lang.toUpperCase()}</span>
+                      <span className={`block text-[9px] font-mono mt-1 ${flag.active ? "text-green-500" : "text-muted-foreground"}`}>
+                        {flag.active ? "ATIVO" : "INATIVO"}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Official Announcements */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <Megaphone className="h-3.5 w-3.5 text-primary" />
+                  ANÚNCIOS OFICIAIS
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">MENSAGEM</Label>
+                    <Textarea
+                      value={announcementText}
+                      onChange={(e) => setAnnouncementText(e.target.value)}
+                      placeholder="Escreva o anúncio para a aliança..."
+                      rows={4}
+                      className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm resize-none"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">CANAL DE DESTINO</Label>
+                    <Select value={announcementChannel} onValueChange={setAnnouncementChannel}>
+                      <SelectTrigger className="sm:w-64 bg-muted/50 border-border/60 text-foreground backdrop-blur-sm">
+                        <SelectValue placeholder="Selecionar canal" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        {channels.map((ch) => (
+                          <SelectItem key={ch.id} value={ch.id}>
+                            <span className="flex items-center gap-2">
+                              <Hash className="h-3 w-3 text-muted-foreground" />
+                              {ch.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button
-                    onClick={handleAddLanguage}
-                    disabled={!selectedLang || !langRoleId}
-                    className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 shrink-0"
+                    disabled={!announcementText || !announcementChannel}
+                    className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
                   >
-                    <Plus className="h-4 w-4" />
-                    ADICIONAR
+                    <Send className="h-4 w-4" />
+                    ENVIAR ANÚNCIO
                   </Button>
                 </div>
               </div>
-
-              {/* Languages table */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md overflow-hidden">
-                <div className="p-5 border-b border-border/30">
-                  <h3 className="font-display text-xs tracking-widest text-muted-foreground">
-                    IDIOMAS CONFIGURADOS ({addedLanguages.length})
-                  </h3>
-                </div>
-                {addedLanguages.length === 0 ? (
-                  <div className="p-8 text-center text-sm text-muted-foreground">
-                    Nenhum idioma adicionado ainda.
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-border/30 hover:bg-transparent">
-                        <TableHead className="text-muted-foreground font-display text-[10px] tracking-widest">
-                          IDIOMA
-                        </TableHead>
-                        <TableHead className="text-muted-foreground font-display text-[10px] tracking-widest">
-                          ROLE ID
-                        </TableHead>
-                        <TableHead className="text-muted-foreground font-display text-[10px] tracking-widest w-16">
-                          AÇÃO
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {addedLanguages.map((lang) => (
-                        <TableRow key={lang.key} className="border-border/20 hover:bg-muted/20">
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <span className="text-lg">{lang.flag}</span>
-                              <span className="text-sm font-medium text-foreground">{lang.label}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <code className="text-xs font-mono text-primary/80 bg-muted/40 px-2 py-1 rounded">
-                              {lang.roleId}
-                            </code>
-                          </TableCell>
-                          <TableCell>
-                            <button
-                              onClick={() => handleRemoveLanguage(lang.key)}
-                              className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </div>
             </div>
           )}
 
-          {/* ───── ANNOUNCEMENTS & MODERATION ───── */}
-          {activeTab === "announcements" && (
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-3 mb-2">
-                <Megaphone className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  CONFIGURAR <span className="text-gradient-ember">ANÚNCIOS</span>
-                </h2>
-              </div>
-              <p className="text-sm text-muted-foreground mb-8">
-                Defina os canais onde o bot enviará mensagens automáticas.
-              </p>
-
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6 md:p-8 space-y-6">
-                <div>
-                  <Label className="text-sm text-foreground font-medium mb-2 flex items-center gap-2">
-                    <Hash className="h-3.5 w-3.5 text-primary" />
-                    Canal de Log (Channel ID)
-                  </Label>
-                  <Input
-                    placeholder="Ex: 987654321098765432"
-                    value={logChannelId}
-                    onChange={(e) => setLogChannelId(e.target.value)}
-                    className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm max-w-md"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-sm text-foreground font-medium mb-2 flex items-center gap-2">
-                    <Hash className="h-3.5 w-3.5 text-primary" />
-                    Canal de Bem-vindo (Channel ID)
-                  </Label>
-                  <Input
-                    placeholder="Ex: 987654321098765432"
-                    value={welcomeChannelId}
-                    onChange={(e) => setWelcomeChannelId(e.target.value)}
-                    className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm max-w-md"
-                  />
-                </div>
-
-                <Button className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2">
-                  SALVAR CONFIGURAÇÕES
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* ───── MODERATION ───── */}
+          {/* ═══════════════ TACTICAL MODERATION ═══════════════ */}
           {activeTab === "moderation" && (
-            <div className="max-w-2xl">
+            <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
-                <Gavel className="h-5 w-5 text-primary" />
+                <Shield className="h-5 w-5 text-primary" />
                 <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  <span className="text-gradient-ember">MODERAÇÃO</span>
+                  MODERAÇÃO <span className="text-gradient-ember">TÁTICA</span>
                 </h2>
               </div>
-              <p className="text-sm text-muted-foreground mb-8">
-                Configure as ferramentas de moderação automática do servidor.
-              </p>
 
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6 md:p-8 space-y-6">
-                {/* Moderation channel inputs */}
-                <div>
-                  <Label className="text-sm text-foreground font-medium mb-2 flex items-center gap-2">
-                    <Hash className="h-3.5 w-3.5 text-primary" />
-                    Canal de Log de Moderação (Channel ID)
-                  </Label>
-                  <Input
-                    placeholder="Ex: 987654321098765432"
-                    className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm max-w-md"
-                  />
-                </div>
-
-                {/* Toggle switches */}
-                <div className="section-divider my-6" />
-
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-4">
-                  OPÇÕES DE AUTO-MODERAÇÃO
+              {/* Blocked Words */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <AlertTriangle className="h-3.5 w-3.5 text-primary" />
+                  FILTRO DE PALAVRAS
                 </h3>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/20 p-4">
-                    <div>
-                      <span className="font-display text-xs font-semibold tracking-wider text-foreground block">
-                        FILTRO AUTOMÁTICO
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Filtra palavrões e conteúdo impróprio automaticamente.
-                      </span>
-                    </div>
-                    <Switch checked={autoFilter} onCheckedChange={setAutoFilter} />
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/20 p-4">
-                    <div>
-                      <span className="font-display text-xs font-semibold tracking-wider text-foreground block">
-                        AUTO-MODERAÇÃO
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Detecta spam, flood e links suspeitos em tempo real.
-                      </span>
-                    </div>
-                    <Switch checked={autoMod} onCheckedChange={setAutoMod} />
-                  </div>
+                <div>
+                  <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">PALAVRAS BLOQUEADAS</Label>
+                  <Textarea
+                    value={blockedWords}
+                    onChange={(e) => setBlockedWords(e.target.value)}
+                    placeholder="Separe palavras por vírgula..."
+                    rows={3}
+                    className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm resize-none"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1.5 font-mono">
+                    {blockedWords.split(",").filter(Boolean).length} PALAVRAS CONFIGURADAS
+                  </p>
                 </div>
-
-                <Button className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 mt-4">
-                  SALVAR CONFIGURAÇÕES
-                </Button>
               </div>
+
+              {/* Anti-Spam Toggles */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <Zap className="h-3.5 w-3.5 text-primary" />
+                  PROTEÇÃO AUTOMÁTICA
+                </h3>
+                <div className="space-y-3">
+                  <ToggleRow label="Anti-Spam" desc="Detecta e remove mensagens de spam automaticamente." checked={antiSpam} onChange={setAntiSpam} />
+                  <ToggleRow label="Anti-Flood" desc="Limita mensagens repetidas em curto intervalo." checked={antiFlood} onChange={setAntiFlood} />
+                  <ToggleRow label="Anti-Link" desc="Bloqueia links externos não autorizados." checked={antiLink} onChange={setAntiLink} />
+                </div>
+              </div>
+
+              {/* Welcome Message */}
+              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
+                  <MessageSquare className="h-3.5 w-3.5 text-primary" />
+                  MENSAGEM DE BOAS-VINDAS
+                </h3>
+                <Textarea
+                  value={welcomeMessage}
+                  onChange={(e) => setWelcomeMessage(e.target.value)}
+                  rows={3}
+                  className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm resize-none mb-3"
+                />
+                <p className="text-[10px] text-muted-foreground font-mono mb-1">
+                  USE {"{user}"} PARA MENCIONAR O NOVO MEMBRO
+                </p>
+
+                <div className="section-divider my-5" />
+
+                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
+                  <Users className="h-3.5 w-3.5 text-primary" />
+                  CARGO AUTOMÁTICO
+                </h3>
+                <Select value={autoRole} onValueChange={setAutoRole}>
+                  <SelectTrigger className="sm:w-64 bg-muted/50 border-border/60 text-foreground backdrop-blur-sm">
+                    <SelectValue placeholder="Selecionar cargo" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    {autoRoles.map((r) => (
+                      <SelectItem key={r.id} value={r.id}>
+                        {r.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2">
+                SALVAR CONFIGURAÇÕES
+              </Button>
             </div>
           )}
         </main>
@@ -463,11 +575,43 @@ const Dashboard = () => {
   );
 };
 
-const StatCard = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+/* ──────────────────── SUB-COMPONENTS ──────────────────── */
+
+const StatCard = ({
+  icon,
+  label,
+  value,
+  accent,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  accent?: boolean;
+}) => (
   <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-5">
     <div className="flex items-center gap-3 mb-2 text-primary">{icon}</div>
-    <p className="font-display text-2xl font-bold text-foreground">{value}</p>
-    <p className="text-xs text-muted-foreground font-display tracking-wider">{label.toUpperCase()}</p>
+    <p className={`font-display text-2xl font-bold ${accent ? "text-primary" : "text-foreground"}`}>{value}</p>
+    <p className="text-[10px] text-muted-foreground font-display tracking-widest mt-1">{label.toUpperCase()}</p>
+  </div>
+);
+
+const ToggleRow = ({
+  label,
+  desc,
+  checked,
+  onChange,
+}: {
+  label: string;
+  desc: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) => (
+  <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/10 px-4 py-3">
+    <div>
+      <span className="font-display text-xs font-semibold tracking-wider text-foreground block">{label.toUpperCase()}</span>
+      <span className="text-[11px] text-muted-foreground">{desc}</span>
+    </div>
+    <Switch checked={checked} onCheckedChange={onChange} />
   </div>
 );
 
