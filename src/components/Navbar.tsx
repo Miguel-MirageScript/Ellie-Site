@@ -1,10 +1,30 @@
 import { Link, useLocation } from "react-router-dom";
 import { Bot, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@supabase/supabase-js";
+
+// Conectando o cérebro do Supabase com as chaves da Vercel
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const Navbar = () => {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
+
+  // A função mágica que faz o Login Real com o Discord
+  const handleDiscordLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'discord',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      }
+    });
+    
+    if (error) {
+      console.error("Erro ao conectar com o Discord:", error.message);
+    }
+  };
 
   const linkClass = (path: string) =>
     `hidden md:inline-block text-sm transition-colors ${
@@ -34,12 +54,11 @@ const Navbar = () => {
               <Link to="/comandos" className={linkClass("/comandos")}>Comandos</Link>
             </>
           )}
-          <Link to="/login">
-            <Button className="glow-button bg-primary text-primary-foreground font-display text-xs tracking-wider gap-2">
-              <LogIn className="h-4 w-4" />
-              PAINEL DE CONTROLE
-            </Button>
-          </Link>
+          {/* Botão blindado com a função de login oficial */}
+          <Button onClick={handleDiscordLogin} className="glow-button bg-primary text-primary-foreground font-display text-xs tracking-wider gap-2">
+            <LogIn className="h-4 w-4" />
+            PAINEL DE CONTROLE
+          </Button>
         </div>
       </div>
     </nav>
