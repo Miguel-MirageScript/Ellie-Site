@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Bot, Server, LogOut, Eye, Globe, Megaphone, Shield,
   Users, Hash, Menu, Plus, Trash2, Clock, Crosshair,
   Zap, AlertTriangle, MessageSquare, Send, Flag,
-  Swords, Target, Timer, Skull, ChevronRight,
+  Swords, Target, Timer, Skull, ChevronRight, Save, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import EmberParticles from "@/components/EmberParticles";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 /* ──────────────────── MOCK DATA ──────────────────── */
 
@@ -57,7 +59,7 @@ const gameTimers = [
   { event: "Próximo CoZ", time: "3d 12:00:00", icon: <Swords className="h-4 w-4" /> },
 ];
 
-const reactionFlags = [
+const reactionFlagsDefault = [
   { emoji: "🇧🇷", lang: "Português", active: true },
   { emoji: "🇺🇸", lang: "Inglês", active: true },
   { emoji: "🇪🇸", lang: "Espanhol", active: true },
@@ -81,6 +83,8 @@ const autoRoles = [
   { id: "visitor", name: "Visitante" },
 ];
 
+const SERVER_ID = "servidor_teste_999";
+
 /* ──────────────────── TYPES ──────────────────── */
 
 type Tab = "overview" | "lss" | "communication" | "moderation";
@@ -97,6 +101,9 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   // LSS State
   const [cozChestReminder, setCozChestReminder] = useState(true);
@@ -106,7 +113,7 @@ const Dashboard = () => {
 
   // Communication State
   const [reactionTranslations, setReactionTranslations] = useState(
-    reactionFlags.map((f) => ({ ...f }))
+    reactionFlagsDefault.map((f) => ({ ...f }))
   );
   const [announcementText, setAnnouncementText] = useState("");
   const [announcementChannel, setAnnouncementChannel] = useState("");
@@ -120,6 +127,104 @@ const Dashboard = () => {
     "⚔️ Bem-vindo(a) ao Last Shelter, soldado {user}! Leia as regras em #regras."
   );
   const [autoRole, setAutoRole] = useState("member");
+
+  // ──────── Load settings from Supabase ────────
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("configuracoes_servidor")
+          .select("*")
+          .eq("id_servidor", SERVER_ID)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erro ao carregar configurações:", error);
+          toast({
+            title: "Erro ao carregar",
+            description: "Não foi possível carregar as configurações do servidor.",
+            variant: "destructive",
+          });
+        } else if (data) {
+          // LSS
+          if (data.coz_chest_reminder !== undefined) setCozChestReminder(data.coz_chest_reminder);
+          if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
+          if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
+          if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
+
+          // Communication - reaction translations
+          if (data.reaction_translations) {
+            setReactionTranslations(data.reaction_translations);
+          }
+
+          // Moderation
+          if (data.blocked_words !== undefined) setBlockedWords(data.blocked_words);
+          if (data.anti_spam !== undefined) setAntiSpam(data.anti_spam);
+          if (data.anti_flood !== undefined) setAntiFlood(data.anti_flood);
+          if (data.anti_link !== undefined) setAntiLink(data.anti_link);
+          if (data.welcome_message !== undefined) setWelcomeMessage(data.welcome_message);
+          if (data.auto_role !== undefined) setAutoRole(data.auto_role);
+        }
+      } catch (err) {
+        console.error("Erro inesperado:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // ──────── Save settings to Supabase ────────
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = {
+        id_servidor: SERVER_ID,
+        // LSS
+        coz_chest_reminder: cozChestReminder,
+        kill_event_alert: killEventAlert,
+        doomsday_targets: doomsdayTargets,
+        safe_zone: safeZone,
+        // Communication
+        reaction_translations: reactionTranslations,
+        // Moderation
+        blocked_words: blockedWords,
+        anti_spam: antiSpam,
+        anti_flood: antiFlood,
+        anti_link: antiLink,
+        welcome_message: welcomeMessage,
+        auto_role: autoRole,
+      };
+
+      const { error } = await supabase
+        .from("configuracoes_servidor")
+        .upsert(payload, { onConflict: "id_servidor" });
+
+      if (error) {
+        console.error("Erro ao salvar:", error);
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "✅ Configurações salvas!",
+          description: "Todas as configurações foram salvas com sucesso no banco de dados.",
+        });
+      }
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      toast({
+        title: "Erro inesperado",
+        description: "Ocorreu um erro ao tentar salvar.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const toggleReactionFlag = (emoji: string) => {
     setReactionTranslations((prev) =>
@@ -394,6 +499,16 @@ const Dashboard = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Save Button */}
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
+              </Button>
             </div>
           )}
 
@@ -481,6 +596,16 @@ const Dashboard = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Save Button */}
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
+              </Button>
             </div>
           )}
 
@@ -564,8 +689,13 @@ const Dashboard = () => {
                 </Select>
               </div>
 
-              <Button className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2">
-                SALVAR CONFIGURAÇÕES
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
               </Button>
             </div>
           )}
