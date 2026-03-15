@@ -72,7 +72,7 @@ const HeroSection = () => {
           A solução definitiva para <span className="text-foreground font-semibold">moderação</span>,{" "}
           <span className="text-foreground font-semibold">tradução</span> e{" "}
           <span className="text-foreground font-semibold">anúncios</span> nos seus servidores de jogos.
-          Last Shelter Survival, FPS, Estratégia e Entre outros.
+          Last Shelter Survival, FPS, Estratégia entre outros.
         </p>
 
         <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4 justify-center">
