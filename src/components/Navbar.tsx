@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Bot, LogIn } from "lucide-react";
+import { Bot, LogIn, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@supabase/supabase-js";
 
-// Conectando o cérebro do Supabase com as chaves da Vercel
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -11,18 +11,30 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const Navbar = () => {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
+  const [session, setSession] = useState<any>(null);
 
-  // A função mágica que faz o Login Real com o Discord
-  const handleDiscordLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'discord',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`
-      }
+  // Sistema de Radar: Verifica continuamente se o Comandante está logado
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
     });
-    
-    if (error) {
-      console.error("Erro ao conectar com o Discord:", error.message);
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleDiscordLogin = async () => {
+    if (!session) {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'discord',
+        options: { redirectTo: `${window.location.origin}/dashboard` }
+      });
+      if (error) console.error("Erro ao conectar:", error.message);
     }
   };
 
@@ -54,11 +66,23 @@ const Navbar = () => {
               <Link to="/comandos" className={linkClass("/comandos")}>Comandos</Link>
             </>
           )}
-          {/* Botão blindado com a função de login oficial */}
-          <Button onClick={handleDiscordLogin} className="glow-button bg-primary text-primary-foreground font-display text-xs tracking-wider gap-2">
-            <LogIn className="h-4 w-4" />
-            PAINEL DE CONTROLE
-          </Button>
+          
+          {/* O Botão Inteligente: Muda dependendo se está logado ou não */}
+          {!isDashboard && (
+            session ? (
+              <Link to="/dashboard">
+                <Button className="glow-button bg-primary text-primary-foreground font-display text-xs tracking-wider gap-2">
+                  <LayoutDashboard className="h-4 w-4" />
+                  MEU PAINEL
+                </Button>
+              </Link>
+            ) : (
+              <Button onClick={handleDiscordLogin} className="glow-button bg-primary text-primary-foreground font-display text-xs tracking-wider gap-2">
+                <LogIn className="h-4 w-4" />
+                PAINEL DE CONTROLE
+              </Button>
+            )
+          )}
         </div>
       </div>
     </nav>
