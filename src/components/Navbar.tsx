@@ -37,7 +37,7 @@ const Navbar = () => {
           <Link to="/login">
             <Button className="glow-button bg-primary text-primary-foreground font-display text-xs tracking-wider gap-2">
               <LogIn className="h-4 w-4" />
-              ENTRAR COM DISCORD
+              PAINEL DE CONTROLE
             </Button>
           </Link>
         </div>
