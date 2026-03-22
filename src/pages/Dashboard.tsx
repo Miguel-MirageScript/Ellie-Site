@@ -24,13 +24,6 @@ import { useToast } from "@/hooks/use-toast";
 
 /* ──────────────────── MOCK DATA ──────────────────── */
 
-const serverInfo = {
-  name: "Last Shelter - State 999",
-  icon: "🏰",
-  members: 3847,
-  online: 612,
-};
-
 const moduleStatuses = [
   { name: "Sistema de Tradução", active: true },
   { name: "Last Shelter Intelligence", active: true },
@@ -105,6 +98,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Server info states (from DB)
+  const [serverName, setServerName] = useState("Carregando...");
+  const [serverIcon, setServerIcon] = useState("🏰");
+  const [memberCount, setMemberCount] = useState(0);
+  const [onlineCount, setOnlineCount] = useState(0);
+
   // LSS State
   const [cozChestReminder, setCozChestReminder] = useState(true);
   const [killEventAlert, setKillEventAlert] = useState(true);
@@ -146,6 +145,12 @@ const Dashboard = () => {
             variant: "destructive",
           });
         } else if (data) {
+          // Server info
+          if (data.server_name) setServerName(data.server_name);
+          if (data.server_icon) setServerIcon(data.server_icon);
+          if (data.member_count !== undefined) setMemberCount(data.member_count);
+          if (data.online_count !== undefined) setOnlineCount(data.online_count);
+
           // LSS
           if (data.coz_chest_reminder !== undefined) setCozChestReminder(data.coz_chest_reminder);
           if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
@@ -338,10 +343,14 @@ const Dashboard = () => {
               {/* Server Header */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <div className="flex items-center gap-4">
-                  <span className="text-4xl">{serverInfo.icon}</span>
+                  {serverIcon.startsWith("http") ? (
+                    <img src={serverIcon} alt="Server Icon" className="h-12 w-12 rounded-lg object-cover" />
+                  ) : (
+                    <span className="text-4xl">{serverIcon}</span>
+                  )}
                   <div>
                     <h2 className="font-display text-lg font-bold tracking-wider text-foreground">
-                      {serverInfo.name}
+                      {serverName}
                     </h2>
                     <p className="text-xs text-muted-foreground font-display tracking-wider mt-1">
                       SERVIDOR GERENCIADO POR ELLIE SURVIVOR
@@ -352,8 +361,8 @@ const Dashboard = () => {
 
               {/* Metric Cards */}
               <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value="3.847" accent />
-                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value="612" />
+                <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value={memberCount.toLocaleString("pt-BR")} accent />
+                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value={onlineCount.toLocaleString("pt-BR")} />
                 <StatCard icon={<Globe className="h-5 w-5" />} label="Idiomas Ativos" value="3" />
                 <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value="142" />
               </div>
