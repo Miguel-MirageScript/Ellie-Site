@@ -1,56 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
-  Bot, Server, LogOut, Eye, Globe, Megaphone, Shield,
-  Users, Hash, Menu, Plus, Trash2, Clock, Crosshair,
-  Zap, AlertTriangle, MessageSquare, Send, Flag,
-  Swords, Target, Timer, Skull, ChevronRight, Save, Loader2,
+  Bot, Server, LogOut, Eye, Globe, Crosshair,
+  Shield, Menu, ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import EmberParticles from "@/components/EmberParticles";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
+import OverviewTab from "@/components/dashboard/OverviewTab";
+import LssTab from "@/components/dashboard/LssTab";
+import CommunicationTab from "@/components/dashboard/CommunicationTab";
+import ModerationTab from "@/components/dashboard/ModerationTab";
+
 /* ──────────────────── MOCK DATA ──────────────────── */
-
-const moduleStatuses = [
-  { name: "Sistema de Tradução", active: true },
-  { name: "Last Shelter Intelligence", active: true },
-  { name: "Comunicação Global", active: true },
-  { name: "Moderação Tática", active: false },
-  { name: "Alertas de Eventos", active: true },
-];
-
-const timeZoneData = [
-  { zone: "Américas", pct: 55, color: "hsl(30 95% 50%)" },
-  { zone: "Europa", pct: 28, color: "hsl(25 100% 55%)" },
-  { zone: "Ásia", pct: 17, color: "hsl(0 0% 50%)" },
-];
-
-const cozDays = [
-  { day: "Dia 1 — Build", points: "500K", active: true },
-  { day: "Dia 2 — Research", points: "400K", active: false },
-  { day: "Dia 3 — Train", points: "600K", active: true },
-  { day: "Dia 4 — Kill Event", points: "1M", active: true },
-];
-
-const gameTimers = [
-  { event: "Ataque Zumbi", time: "02:45:12", icon: <Skull className="h-4 w-4" /> },
-  { event: "Bunker", time: "08:15:30", icon: <Target className="h-4 w-4" /> },
-  { event: "Doomsday Reset", time: "1d 04:22:00", icon: <Timer className="h-4 w-4" /> },
-  { event: "Próximo CoZ", time: "3d 12:00:00", icon: <Swords className="h-4 w-4" /> },
-];
 
 const reactionFlagsDefault = [
   { emoji: "🇧🇷", lang: "Português", active: true },
@@ -61,19 +25,6 @@ const reactionFlagsDefault = [
   { emoji: "🇩🇪", lang: "Alemão", active: false },
   { emoji: "🇨🇳", lang: "Chinês", active: false },
   { emoji: "🇯🇵", lang: "Japonês", active: false },
-];
-
-const channels = [
-  { id: "general", name: "#geral" },
-  { id: "announcements", name: "#anúncios" },
-  { id: "alliance", name: "#aliança" },
-  { id: "war-room", name: "#sala-de-guerra" },
-];
-
-const autoRoles = [
-  { id: "member", name: "Membro" },
-  { id: "recruit", name: "Recruta" },
-  { id: "visitor", name: "Visitante" },
 ];
 
 const SERVER_ID = "servidor_teste_999";
@@ -103,6 +54,13 @@ const Dashboard = () => {
   const [serverIcon, setServerIcon] = useState("🏰");
   const [memberCount, setMemberCount] = useState(0);
   const [onlineCount, setOnlineCount] = useState(0);
+
+  // Module states
+  const [modTraducao, setModTraducao] = useState(true);
+  const [modIntelligence, setModIntelligence] = useState(true);
+  const [modComunicacao, setModComunicacao] = useState(true);
+  const [modModeracao, setModModeracao] = useState(false);
+  const [modAlertas, setModAlertas] = useState(true);
 
   // LSS State
   const [cozChestReminder, setCozChestReminder] = useState(true);
@@ -151,6 +109,13 @@ const Dashboard = () => {
           if (data.member_count !== undefined) setMemberCount(data.member_count);
           if (data.online_count !== undefined) setOnlineCount(data.online_count);
 
+          // Modules
+          if (data.mod_traducao !== undefined) setModTraducao(data.mod_traducao);
+          if (data.mod_intelligence !== undefined) setModIntelligence(data.mod_intelligence);
+          if (data.mod_comunicacao !== undefined) setModComunicacao(data.mod_comunicacao);
+          if (data.mod_moderacao !== undefined) setModModeracao(data.mod_moderacao);
+          if (data.mod_alertas !== undefined) setModAlertas(data.mod_alertas);
+
           // LSS
           if (data.coz_chest_reminder !== undefined) setCozChestReminder(data.coz_chest_reminder);
           if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
@@ -186,6 +151,12 @@ const Dashboard = () => {
     try {
       const payload = {
         id_servidor: SERVER_ID,
+        // Modules
+        mod_traducao: modTraducao,
+        mod_intelligence: modIntelligence,
+        mod_comunicacao: modComunicacao,
+        mod_moderacao: modModeracao,
+        mod_alertas: modAlertas,
         // LSS
         coz_chest_reminder: cozChestReminder,
         kill_event_alert: killEventAlert,
@@ -341,421 +312,75 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          {/* ═══════════════ OVERVIEW ═══════════════ */}
           {activeTab === "overview" && (
-            <div className="space-y-6">
-              {/* Server Header */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <div className="flex items-center gap-4">
-                  {serverIcon.startsWith("http") ? (
-                    <img src={serverIcon} alt="Server Icon" className="h-12 w-12 rounded-lg object-cover" />
-                  ) : (
-                    <span className="text-4xl">{serverIcon}</span>
-                  )}
-                  <div>
-                    <h2 className="font-display text-lg font-bold tracking-wider text-foreground">
-                      {serverName}
-                    </h2>
-                    <p className="text-xs text-muted-foreground font-display tracking-wider mt-1">
-                      SERVIDOR GERENCIADO POR ELLIE SURVIVOR
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Metric Cards */}
-              <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value={memberCount.toLocaleString("pt-BR")} accent />
-                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value={onlineCount.toLocaleString("pt-BR")} />
-                <StatCard icon={<Globe className="h-5 w-5" />} label="Idiomas Ativos" value="3" />
-                <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value="142" />
-              </div>
-
-              {/* Alliance Time Zones Chart */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
-                  FUSOS HORÁRIOS DA ALIANÇA
-                </h3>
-                <div className="space-y-4">
-                  {timeZoneData.map((tz) => (
-                    <div key={tz.zone}>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-foreground font-display tracking-wider">{tz.zone.toUpperCase()}</span>
-                        <span className="text-primary font-mono">{tz.pct}%</span>
-                      </div>
-                      <div className="w-full h-3 rounded-full bg-muted/40 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-1000"
-                          style={{
-                            width: `${tz.pct}%`,
-                            background: `linear-gradient(90deg, ${tz.color}, ${tz.color}88)`,
-                            boxShadow: `0 0 12px ${tz.color}66`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Donut visual */}
-                <div className="flex items-center justify-center mt-6">
-                  <div className="relative w-32 h-32">
-                    <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 14%)" strokeWidth="3" />
-                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(30 95% 50%)" strokeWidth="3"
-                        strokeDasharray="55 45" strokeDashoffset="0" className="drop-shadow-[0_0_6px_hsl(30_95%_50%_/_0.6)]" />
-                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(25 100% 55%)" strokeWidth="3"
-                        strokeDasharray="28 72" strokeDashoffset="-55" className="drop-shadow-[0_0_6px_hsl(25_100%_55%_/_0.6)]" />
-                      <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 50%)" strokeWidth="3"
-                        strokeDasharray="17 83" strokeDashoffset="-83" />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="font-display text-xs text-primary font-bold">3 ZONAS</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Module Status */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
-                  STATUS DOS MÓDULOS
-                </h3>
-                <div className="space-y-3">
-                  {moduleStatuses.map((mod) => (
-                    <div key={mod.name} className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/10 px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <span className={`h-2 w-2 rounded-full ${mod.active ? "bg-green-500 shadow-[0_0_8px_hsl(120_60%_50%_/_0.5)]" : "bg-muted-foreground/40"}`} />
-                        <span className="text-xs font-display tracking-wider text-foreground">{mod.name.toUpperCase()}</span>
-                      </div>
-                      <Switch checked={mod.active} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <OverviewTab
+              serverName={serverName}
+              serverIcon={serverIcon}
+              memberCount={memberCount}
+              onlineCount={onlineCount}
+              modTraducao={modTraducao}
+              setModTraducao={setModTraducao}
+              modIntelligence={modIntelligence}
+              setModIntelligence={setModIntelligence}
+              modComunicacao={modComunicacao}
+              setModComunicacao={setModComunicacao}
+              modModeracao={modModeracao}
+              setModModeracao={setModModeracao}
+              modAlertas={modAlertas}
+              setModAlertas={setModAlertas}
+            />
           )}
 
-          {/* ═══════════════ LSS INTELLIGENCE ═══════════════ */}
           {activeTab === "lss" && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Crosshair className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  LAST SHELTER <span className="text-gradient-ember">INTELLIGENCE</span>
-                </h2>
-              </div>
-
-              {/* CoZ Configuration */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <Swords className="h-3.5 w-3.5 text-primary" />
-                  CLASH OF ZONES (COZ) — CONFIGURAÇÃO
-                </h3>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {cozDays.map((d) => (
-                    <div key={d.day} className={`rounded-lg border px-4 py-3 ${d.active ? "border-primary/30 bg-primary/5" : "border-border/40 bg-muted/10"}`}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-display tracking-wider text-foreground">{d.day.toUpperCase()}</span>
-                        <span className="text-xs font-mono text-primary">{d.points}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="section-divider my-5" />
-                <div className="space-y-4">
-                  <ToggleRow label="Lembrete de Baú" desc="Envia alerta quando baús CoZ estiverem disponíveis." checked={cozChestReminder} onChange={setCozChestReminder} />
-                  <ToggleRow label="Alerta Kill Event" desc="Notifica membros antes do dia de Kill Event." checked={killEventAlert} onChange={setKillEventAlert} />
-                </div>
-              </div>
-
-              {/* Doomsday / Eden */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <AlertTriangle className="h-3.5 w-3.5 text-primary" />
-                  DOOMSDAY / EDEN — CONFIGURAÇÃO
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">ALVOS PRIORITÁRIOS</Label>
-                    <Input
-                      value={doomsdayTargets}
-                      onChange={(e) => setDoomsdayTargets(e.target.value)}
-                      className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">ZONA SEGURA</Label>
-                    <Input
-                      value={safeZone}
-                      onChange={(e) => setSafeZone(e.target.value)}
-                      className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Game Event Timers */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <Clock className="h-3.5 w-3.5 text-primary" />
-                  TEMPORIZADORES DE EVENTOS
-                </h3>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {gameTimers.map((t) => (
-                    <div key={t.event} className="rounded-lg border border-border/40 bg-muted/10 px-4 py-4 flex items-center gap-4">
-                      <div className="text-primary">{t.icon}</div>
-                      <div className="flex-1">
-                        <span className="text-xs font-display tracking-wider text-foreground block">{t.event.toUpperCase()}</span>
-                        <span className="text-lg font-mono text-primary font-bold">{t.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Save Button */}
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
-              </Button>
-            </div>
+            <LssTab
+              cozChestReminder={cozChestReminder}
+              setCozChestReminder={setCozChestReminder}
+              killEventAlert={killEventAlert}
+              setKillEventAlert={setKillEventAlert}
+              doomsdayTargets={doomsdayTargets}
+              setDoomsdayTargets={setDoomsdayTargets}
+              safeZone={safeZone}
+              setSafeZone={setSafeZone}
+              saving={saving}
+              handleSave={handleSave}
+            />
           )}
 
-          {/* ═══════════════ GLOBAL COMMUNICATION ═══════════════ */}
           {activeTab === "communication" && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Globe className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  COMUNICAÇÃO <span className="text-gradient-ember">GLOBAL</span>
-                </h2>
-              </div>
-
-              {/* Reaction Translation */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
-                  <Flag className="h-3.5 w-3.5 text-primary" />
-                  TRADUÇÃO POR REAÇÃO
-                </h3>
-                <p className="text-xs text-muted-foreground mb-5">
-                  A tradução <strong className="text-foreground">NÃO</strong> é automática. Ela é ativada quando alguém reage a uma mensagem com o emoji de bandeira correspondente.
-                </p>
-                <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
-                  {reactionTranslations.map((flag) => (
-                    <button
-                      key={flag.emoji}
-                      onClick={() => toggleReactionFlag(flag.emoji)}
-                      className={`rounded-lg border px-4 py-3 text-center transition-all duration-200 ${
-                        flag.active
-                          ? "border-primary/40 bg-primary/10 shadow-[0_0_15px_hsl(30_95%_50%_/_0.15)]"
-                          : "border-border/40 bg-muted/10 opacity-50 hover:opacity-75"
-                      }`}
-                    >
-                      <span className="text-2xl block mb-1">{flag.emoji}</span>
-                      <span className="text-[10px] font-display tracking-wider text-foreground">{flag.lang.toUpperCase()}</span>
-                      <span className={`block text-[9px] font-mono mt-1 ${flag.active ? "text-green-500" : "text-muted-foreground"}`}>
-                        {flag.active ? "ATIVO" : "INATIVO"}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Official Announcements */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <Megaphone className="h-3.5 w-3.5 text-primary" />
-                  ANÚNCIOS OFICIAIS
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">MENSAGEM</Label>
-                    <Textarea
-                      value={announcementText}
-                      onChange={(e) => setAnnouncementText(e.target.value)}
-                      placeholder="Escreva o anúncio para a aliança..."
-                      rows={4}
-                      className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm resize-none"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">CANAL DE DESTINO</Label>
-                    <Select value={announcementChannel} onValueChange={setAnnouncementChannel}>
-                      <SelectTrigger className="sm:w-64 bg-muted/50 border-border/60 text-foreground backdrop-blur-sm">
-                        <SelectValue placeholder="Selecionar canal" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border">
-                        {channels.map((ch) => (
-                          <SelectItem key={ch.id} value={ch.id}>
-                            <span className="flex items-center gap-2">
-                              <Hash className="h-3 w-3 text-muted-foreground" />
-                              {ch.name}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    disabled={!announcementText || !announcementChannel}
-                    className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
-                  >
-                    <Send className="h-4 w-4" />
-                    ENVIAR ANÚNCIO
-                  </Button>
-                </div>
-              </div>
-
-              {/* Save Button */}
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
-              </Button>
-            </div>
+            <CommunicationTab
+              reactionTranslations={reactionTranslations}
+              toggleReactionFlag={toggleReactionFlag}
+              announcementText={announcementText}
+              setAnnouncementText={setAnnouncementText}
+              announcementChannel={announcementChannel}
+              setAnnouncementChannel={setAnnouncementChannel}
+              saving={saving}
+              handleSave={handleSave}
+            />
           )}
 
-          {/* ═══════════════ TACTICAL MODERATION ═══════════════ */}
           {activeTab === "moderation" && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  MODERAÇÃO <span className="text-gradient-ember">TÁTICA</span>
-                </h2>
-              </div>
-
-              {/* Blocked Words */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <AlertTriangle className="h-3.5 w-3.5 text-primary" />
-                  FILTRO DE PALAVRAS
-                </h3>
-                <div>
-                  <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">PALAVRAS BLOQUEADAS</Label>
-                  <Textarea
-                    value={blockedWords}
-                    onChange={(e) => setBlockedWords(e.target.value)}
-                    placeholder="Separe palavras por vírgula..."
-                    rows={3}
-                    className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm resize-none"
-                  />
-                  <p className="text-[10px] text-muted-foreground mt-1.5 font-mono">
-                    {blockedWords.split(",").filter(Boolean).length} PALAVRAS CONFIGURADAS
-                  </p>
-                </div>
-              </div>
-
-              {/* Anti-Spam Toggles */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <Zap className="h-3.5 w-3.5 text-primary" />
-                  PROTEÇÃO AUTOMÁTICA
-                </h3>
-                <div className="space-y-3">
-                  <ToggleRow label="Anti-Spam" desc="Detecta e remove mensagens de spam automaticamente." checked={antiSpam} onChange={setAntiSpam} />
-                  <ToggleRow label="Anti-Flood" desc="Limita mensagens repetidas em curto intervalo." checked={antiFlood} onChange={setAntiFlood} />
-                  <ToggleRow label="Anti-Link" desc="Bloqueia links externos não autorizados." checked={antiLink} onChange={setAntiLink} />
-                </div>
-              </div>
-
-              {/* Welcome Message */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
-                  <MessageSquare className="h-3.5 w-3.5 text-primary" />
-                  MENSAGEM DE BOAS-VINDAS
-                </h3>
-                <Textarea
-                  value={welcomeMessage}
-                  onChange={(e) => setWelcomeMessage(e.target.value)}
-                  rows={3}
-                  className="bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-primary/50 backdrop-blur-sm resize-none mb-3"
-                />
-                <p className="text-[10px] text-muted-foreground font-mono mb-1">
-                  USE {"{user}"} PARA MENCIONAR O NOVO MEMBRO
-                </p>
-
-                <div className="section-divider my-5" />
-
-                <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
-                  <Users className="h-3.5 w-3.5 text-primary" />
-                  CARGO AUTOMÁTICO
-                </h3>
-                <Select value={autoRole} onValueChange={setAutoRole}>
-                  <SelectTrigger className="sm:w-64 bg-muted/50 border-border/60 text-foreground backdrop-blur-sm">
-                    <SelectValue placeholder="Selecionar cargo" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    {autoRoles.map((r) => (
-                      <SelectItem key={r.id} value={r.id}>
-                        {r.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2"
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
-              </Button>
-            </div>
+            <ModerationTab
+              blockedWords={blockedWords}
+              setBlockedWords={setBlockedWords}
+              antiSpam={antiSpam}
+              setAntiSpam={setAntiSpam}
+              antiFlood={antiFlood}
+              setAntiFlood={setAntiFlood}
+              antiLink={antiLink}
+              setAntiLink={setAntiLink}
+              welcomeMessage={welcomeMessage}
+              setWelcomeMessage={setWelcomeMessage}
+              autoRole={autoRole}
+              setAutoRole={setAutoRole}
+              saving={saving}
+              handleSave={handleSave}
+            />
           )}
         </main>
       </div>
     </div>
   );
 };
-
-/* ──────────────────── SUB-COMPONENTS ──────────────────── */
-
-const StatCard = ({
-  icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent?: boolean;
-}) => (
-  <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-5">
-    <div className="flex items-center gap-3 mb-2 text-primary">{icon}</div>
-    <p className={`font-display text-2xl font-bold ${accent ? "text-primary" : "text-foreground"}`}>{value}</p>
-    <p className="text-[10px] text-muted-foreground font-display tracking-widest mt-1">{label.toUpperCase()}</p>
-  </div>
-);
-
-const ToggleRow = ({
-  label,
-  desc,
-  checked,
-  onChange,
-}: {
-  label: string;
-  desc: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) => (
-  <div className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/10 px-4 py-3">
-    <div>
-      <span className="font-display text-xs font-semibold tracking-wider text-foreground block">{label.toUpperCase()}</span>
-      <span className="text-[11px] text-muted-foreground">{desc}</span>
-    </div>
-    <Switch checked={checked} onCheckedChange={onChange} />
-  </div>
-);
 
 export default Dashboard;
