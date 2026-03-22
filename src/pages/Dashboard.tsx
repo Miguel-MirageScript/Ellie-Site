@@ -54,6 +54,8 @@ const Dashboard = () => {
   const [serverIcon, setServerIcon] = useState("🏰");
   const [memberCount, setMemberCount] = useState(0);
   const [onlineCount, setOnlineCount] = useState(0);
+  const [idiomasAtivos, setIdiomasAtivos] = useState(0);
+  const [ameacasBloqueadas, setAmeacasBloqueadas] = useState(0);
 
   // Module states
   const [modTraducao, setModTraducao] = useState(true);
@@ -108,6 +110,8 @@ const Dashboard = () => {
           if (data.server_icon) setServerIcon(data.server_icon);
           if (data.member_count !== undefined) setMemberCount(data.member_count);
           if (data.online_count !== undefined) setOnlineCount(data.online_count);
+          if (data.idiomas_ativos !== undefined) setIdiomasAtivos(data.idiomas_ativos);
+          if (data.ameacas_bloqueadas !== undefined) setAmeacasBloqueadas(data.ameacas_bloqueadas);
 
           // Modules
           if (data.mod_traducao !== undefined) setModTraducao(data.mod_traducao);
@@ -318,6 +322,8 @@ const Dashboard = () => {
               serverIcon={serverIcon}
               memberCount={memberCount}
               onlineCount={onlineCount}
+              idiomasAtivos={idiomasAtivos}
+              ameacasBloqueadas={ameacasBloqueadas}
               modTraducao={modTraducao}
               setModTraducao={setModTraducao}
               modIntelligence={modIntelligence}
@@ -328,6 +334,8 @@ const Dashboard = () => {
               setModModeracao={setModModeracao}
               modAlertas={modAlertas}
               setModAlertas={setModAlertas}
+              handleSave={handleSave}
+              saving={saving}
             />
           )}
 
@@ -384,3 +392,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+  
