@@ -1,5 +1,6 @@
-import { Users, Eye, Globe, Shield } from "lucide-react";
+import { Users, Eye, Globe, Shield, Save, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 
 const timeZoneData = [
   { zone: "Américas", pct: 55, color: "hsl(30 95% 50%)" },
@@ -30,6 +31,8 @@ interface OverviewTabProps {
   serverIcon: string;
   memberCount: number;
   onlineCount: number;
+  idiomasAtivos: number;
+  ameacasBloqueadas: number;
   modTraducao: boolean;
   setModTraducao: (v: boolean) => void;
   modIntelligence: boolean;
@@ -40,6 +43,8 @@ interface OverviewTabProps {
   setModModeracao: (v: boolean) => void;
   modAlertas: boolean;
   setModAlertas: (v: boolean) => void;
+  handleSave: () => void;
+  saving: boolean;
 }
 
 const OverviewTab = ({
@@ -47,6 +52,8 @@ const OverviewTab = ({
   serverIcon,
   memberCount,
   onlineCount,
+  idiomasAtivos,
+  ameacasBloqueadas,
   modTraducao,
   setModTraducao,
   modIntelligence,
@@ -57,6 +64,8 @@ const OverviewTab = ({
   setModModeracao,
   modAlertas,
   setModAlertas,
+  handleSave,
+  saving,
 }: OverviewTabProps) => {
   const modules = [
     { name: "Sistema de Tradução", checked: modTraducao, onChange: setModTraducao },
@@ -72,7 +81,7 @@ const OverviewTab = ({
       <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
         <div className="flex items-center gap-4">
           {serverIcon.startsWith("http") ? (
-            <img src={serverIcon} alt="Server Icon" className="h-12 w-12 rounded-lg object-cover" />
+            <img src={serverIcon} alt="Server Icon" className="h-12 w-12 rounded-lg object-cover shadow-[0_0_15px_rgba(255,100,0,0.3)]" />
           ) : (
             <span className="text-4xl">{serverIcon}</span>
           )}
@@ -91,8 +100,8 @@ const OverviewTab = ({
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value={memberCount.toLocaleString("pt-BR")} accent />
         <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value={onlineCount.toLocaleString("pt-BR")} />
-        <StatCard icon={<Globe className="h-5 w-5" />} label="Idiomas Ativos" value="3" />
-        <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value="142" />
+        <StatCard icon={<Globe className="h-5 w-5" />} label="Idiomas Ativos" value={idiomasAtivos.toString()} />
+        <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value={ameacasBloqueadas.toLocaleString("pt-BR")} />
       </div>
 
       {/* Alliance Time Zones Chart */}
@@ -156,8 +165,19 @@ const OverviewTab = ({
           ))}
         </div>
       </div>
+
+      {/* Save Button */}
+      <Button
+        onClick={handleSave}
+        disabled={saving}
+        className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 w-full sm:w-auto"
+      >
+        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+        {saving ? "SALVANDO..." : "SALVAR CONFIGURAÇÕES"}
+      </Button>
     </div>
   );
 };
 
 export default OverviewTab;
+          
