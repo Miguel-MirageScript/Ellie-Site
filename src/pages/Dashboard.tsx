@@ -259,9 +259,13 @@ const Dashboard = () => {
             </Link>
             <span className="text-muted-foreground/40">/</span>
             <div className="flex items-center gap-2">
-              <span className="text-xl">{serverInfo.icon}</span>
+              {serverIcon.startsWith("http") ? (
+                <img src={serverIcon} alt="Server Icon" className="h-6 w-6 rounded-md object-cover" />
+              ) : (
+                <span className="text-xl">{serverIcon}</span>
+              )}
               <span className="text-xs font-medium text-foreground font-display tracking-wide">
-                {serverInfo.name}
+                {serverName}
               </span>
             </div>
           </div>
