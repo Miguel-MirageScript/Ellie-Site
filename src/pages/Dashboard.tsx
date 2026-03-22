@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Bot, Server, LogOut, Eye, Globe, Megaphone, Shield,
   Users, Hash, Menu, Plus, Trash2, Clock, Crosshair,
@@ -100,6 +100,12 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+    const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -267,11 +273,9 @@ const Dashboard = () => {
                 <span className="hidden sm:inline">Trocar Servidor</span>
               </Button>
             </Link>
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </Link>
+              <Button onClick={handleLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
