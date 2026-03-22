@@ -24,13 +24,6 @@ import { useToast } from "@/hooks/use-toast";
 
 /* ──────────────────── MOCK DATA ──────────────────── */
 
-const serverInfo = {
-  name: "Last Shelter - State 999",
-  icon: "🏰",
-  members: 3847,
-  online: 612,
-};
-
 const moduleStatuses = [
   { name: "Sistema de Tradução", active: true },
   { name: "Last Shelter Intelligence", active: true },
@@ -97,19 +90,25 @@ const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 /* ──────────────────── COMPONENT ──────────────────── */
-
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
   };
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  // --- DADOS REAIS DO SERVIDOR (RADAR) ---
+  const [serverName, setServerName] = useState("Carregando...");
+  const [serverIcon, setServerIcon] = useState("🏰");
+  const [memberCount, setMemberCount] = useState(0);
+  const [onlineCount, setOnlineCount] = useState(0);
 
   // LSS State
   const [cozChestReminder, setCozChestReminder] = useState(true);
@@ -133,6 +132,7 @@ const Dashboard = () => {
     "⚔️ Bem-vindo(a) ao Last Shelter, soldado {user}! Leia as regras em #regras."
   );
   const [autoRole, setAutoRole] = useState("member");
+  
 
   // ──────── Load settings from Supabase ────────
   useEffect(() => {
@@ -151,12 +151,19 @@ const Dashboard = () => {
             description: "Não foi possível carregar as configurações do servidor.",
             variant: "destructive",
           });
-        } else if (data) {
+                } else if (data) {
+          // --- DADOS REAIS DO SERVIDOR (RADAR) ---
+          if (data.server_name !== undefined) setServerName(data.server_name);
+          if (data.server_icon !== undefined) setServerIcon(data.server_icon);
+          if (data.member_count !== undefined) setMemberCount(data.member_count);
+          if (data.online_count !== undefined) setOnlineCount(data.online_count);
+
           // LSS
           if (data.coz_chest_reminder !== undefined) setCozChestReminder(data.coz_chest_reminder);
           if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
           if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
           if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
+          
 
           // Communication - reaction translations
           if (data.reaction_translations) {
@@ -242,13 +249,18 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <EmberParticles />
 
-      {/* Header */}
-      <header className="relative z-30 border-b border-border/50 bg-background/60 backdrop-blur-xl flex-shrink-0">
-        <div className="flex h-14 items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-muted-foreground hover:text-foreground lg:hidden"
+                  <div className="flex items-center gap-2">
+              <span className="text-xl flex items-center">
+                {serverIcon.startsWith('http') ? (
+                  <img src={serverIcon} alt="Icon" className="w-5 h-5 rounded-full" />
+                ) : (
+                  serverIcon
+                )}
+              </span>
+              <span className="text-xs font-medium text-foreground font-display tracking-wide">
+                {serverName}
+              </span>
+            </div>
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -342,10 +354,16 @@ const Dashboard = () => {
               {/* Server Header */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <div className="flex items-center gap-4">
-                  <span className="text-4xl">{serverInfo.icon}</span>
+                  <span className="text-4xl flex items-center">
+                    {serverIcon.startsWith('http') ? (
+                      <img src={serverIcon} alt="Icon" className="w-12 h-12 rounded-full shadow-[0_0_15px_rgba(255,100,0,0.3)]" />
+                    ) : (
+                      serverIcon
+                    )}
+                  </span>
                   <div>
                     <h2 className="font-display text-lg font-bold tracking-wider text-foreground">
-                      {serverInfo.name}
+                      {serverName}
                     </h2>
                     <p className="text-xs text-muted-foreground font-display tracking-wider mt-1">
                       SERVIDOR GERENCIADO POR ELLIE SURVIVOR
@@ -356,8 +374,8 @@ const Dashboard = () => {
 
               {/* Metric Cards */}
               <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value="3.847" accent />
-                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value="612" />
+                <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value={memberCount.toString()} accent />
+                <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value={onlineCount.toString()} />
                 <StatCard icon={<Globe className="h-5 w-5" />} label="Idiomas Ativos" value="3" />
                 <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value="142" />
               </div>
@@ -425,7 +443,7 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-
+          
           {/* ═══════════════ LSS INTELLIGENCE ═══════════════ */}
           {activeTab === "lss" && (
             <div className="space-y-6">
