@@ -132,7 +132,6 @@ const Dashboard = () => {
     "⚔️ Bem-vindo(a) ao Last Shelter, soldado {user}! Leia as regras em #regras."
   );
   const [autoRole, setAutoRole] = useState("member");
-  
 
   // ──────── Load settings from Supabase ────────
   useEffect(() => {
@@ -193,14 +192,11 @@ const Dashboard = () => {
     try {
       const payload = {
         id_servidor: SERVER_ID,
-        // LSS
         coz_chest_reminder: cozChestReminder,
         kill_event_alert: killEventAlert,
         doomsday_targets: doomsdayTargets,
         safe_zone: safeZone,
-        // Communication
         reaction_translations: reactionTranslations,
-        // Moderation
         blocked_words: blockedWords,
         anti_spam: antiSpam,
         anti_flood: antiFlood,
@@ -248,7 +244,6 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <EmberParticles />
 
-      {/* Header Corrigido */}
       <header className="relative z-30 border-b border-border/50 bg-background/60 backdrop-blur-xl flex-shrink-0">
         <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
@@ -295,7 +290,6 @@ const Dashboard = () => {
       </header>
 
       <div className="flex flex-1 relative z-20 overflow-hidden">
-        {/* Sidebar */}
         <aside
           className={`${
             sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
@@ -305,7 +299,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-display tracking-widest">
               <Shield className="h-3.5 w-3.5 text-primary" />
               PAINEL TÁTICO
-            </div>
+                          </div>
           </div>
 
           <nav className="flex-1 p-3 space-y-1">
@@ -340,7 +334,6 @@ const Dashboard = () => {
           </div>
         </aside>
 
-        {/* Mobile overlay */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-background/60 z-20 lg:hidden"
@@ -348,12 +341,9 @@ const Dashboard = () => {
           />
         )}
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          {/* ═══════════════ OVERVIEW ═══════════════ */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              {/* Server Header */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <div className="flex items-center gap-4">
                   <span className="text-4xl flex items-center">
@@ -374,7 +364,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Metric Cards */}
               <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
                 <StatCard icon={<Users className="h-5 w-5" />} label="Total Membros" value={memberCount.toString()} accent />
                 <StatCard icon={<Eye className="h-5 w-5" />} label="Online Agora" value={onlineCount.toString()} />
@@ -382,8 +371,7 @@ const Dashboard = () => {
                 <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value="142" />
               </div>
 
-              {/* Alliance Time Zones Chart */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                            <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
                   FUSOS HORÁRIOS DA ALIANÇA
                 </h3>
@@ -407,7 +395,6 @@ const Dashboard = () => {
                     </div>
                   ))}
                 </div>
-                {/* Donut visual */}
                 <div className="flex items-center justify-center mt-6">
                   <div className="relative w-32 h-32">
                     <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
@@ -426,7 +413,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Module Status */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
                   STATUS DOS MÓDULOS
@@ -446,7 +432,6 @@ const Dashboard = () => {
             </div>
           )}
           
-          {/* ═══════════════ LSS INTELLIGENCE ═══════════════ */}
           {activeTab === "lss" && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
@@ -456,7 +441,6 @@ const Dashboard = () => {
                 </h2>
               </div>
 
-              {/* CoZ Configuration */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <Swords className="h-3.5 w-3.5 text-primary" />
@@ -479,11 +463,10 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Doomsday / Eden */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <AlertTriangle className="h-3.5 w-3.5 text-primary" />
-                  DOOMSDAY / EDEN — CONFIGURAÇÃO
+                                    DOOMSDAY / EDEN — CONFIGURAÇÃO
                 </h3>
                 <div className="space-y-4">
                   <div>
@@ -505,7 +488,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Game Event Timers */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <Clock className="h-3.5 w-3.5 text-primary" />
@@ -524,7 +506,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Save Button */}
               <Button
                 onClick={handleSave}
                 disabled={saving}
@@ -535,7 +516,7 @@ const Dashboard = () => {
               </Button>
             </div>
           )}
-                    {/* ═══════════════ GLOBAL COMMUNICATION ═══════════════ */}
+
           {activeTab === "communication" && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
@@ -545,14 +526,13 @@ const Dashboard = () => {
                 </h2>
               </div>
 
-              {/* Reaction Translation */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
                   <Flag className="h-3.5 w-3.5 text-primary" />
                   TRADUÇÃO POR REAÇÃO
-                </h3>
+                                  </h3>
                 <p className="text-xs text-muted-foreground mb-5">
-                  A tradução <strong className="text-foreground">NÃO</strong> é automática. Ela é ativada quando alguém reage a uma mensagem com o emoji de bandeira correspondente.
+                  A tradução <strong>NÃO</strong> é automática. Ela é ativada quando alguém reage a uma mensagem com o emoji de bandeira correspondente.
                 </p>
                 <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
                   {reactionTranslations.map((flag) => (
@@ -575,7 +555,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Official Announcements */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <Megaphone className="h-3.5 w-3.5 text-primary" />
@@ -620,7 +599,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Save Button */}
               <Button
                 onClick={handleSave}
                 disabled={saving}
@@ -631,18 +609,17 @@ const Dashboard = () => {
               </Button>
             </div>
           )}
-                    {/* ═══════════════ TACTICAL MODERATION ═══════════════ */}
+
           {activeTab === "moderation" && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
                 <Shield className="h-5 w-5 text-primary" />
                 <h2 className="font-display text-xl font-bold tracking-wider text-foreground">
-                  MODERAÇÃO <span className="text-gradient-ember">TÁTICA</span>
+                  MODERAÇÃO TÁTICA
                 </h2>
               </div>
 
-              {/* Blocked Words */}
-              <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
+                            <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <AlertTriangle className="h-3.5 w-3.5 text-primary" />
                   FILTRO DE PALAVRAS
@@ -662,7 +639,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Anti-Spam Toggles */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <Zap className="h-3.5 w-3.5 text-primary" />
@@ -675,7 +651,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Welcome Message */}
               <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
                 <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2">
                   <MessageSquare className="h-3.5 w-3.5 text-primary" />
