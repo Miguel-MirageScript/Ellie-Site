@@ -151,7 +151,7 @@ const Dashboard = () => {
             description: "Não foi possível carregar as configurações do servidor.",
             variant: "destructive",
           });
-                } else if (data) {
+        } else if (data) {
           // --- DADOS REAIS DO SERVIDOR (RADAR) ---
           if (data.server_name !== undefined) setServerName(data.server_name);
           if (data.server_icon !== undefined) setServerIcon(data.server_icon);
@@ -163,7 +163,6 @@ const Dashboard = () => {
           if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
           if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
           if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
-          
 
           // Communication - reaction translations
           if (data.reaction_translations) {
@@ -249,7 +248,25 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <EmberParticles />
 
-                  <div className="flex items-center gap-2">
+      {/* Header Corrigido */}
+      <header className="relative z-30 border-b border-border/50 bg-background/60 backdrop-blur-xl flex-shrink-0">
+        <div className="flex h-14 items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-muted-foreground hover:text-foreground lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <Link to="/" className="flex items-center gap-2">
+              <Bot className="h-5 w-5 text-primary" />
+              <span className="font-display text-xs font-bold tracking-wider text-foreground hidden sm:inline">
+                ELLIE
+              </span>
+            </Link>
+            <span className="text-muted-foreground/40">/</span>
+            
+            <div className="flex items-center gap-2">
               <span className="text-xl flex items-center">
                 {serverIcon.startsWith('http') ? (
                   <img src={serverIcon} alt="Icon" className="w-5 h-5 rounded-full" />
@@ -261,22 +278,7 @@ const Dashboard = () => {
                 {serverName}
               </span>
             </div>
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <Link to="/" className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
-              <span className="font-display text-xs font-bold tracking-wider text-foreground hidden sm:inline">
-                ELLIE
-              </span>
-            </Link>
-            <span className="text-muted-foreground/40">/</span>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{serverInfo.icon}</span>
-              <span className="text-xs font-medium text-foreground font-display tracking-wide">
-                {serverInfo.name}
-              </span>
-            </div>
+
           </div>
           <div className="flex items-center gap-2">
             <Link to="/select-server">
@@ -285,7 +287,7 @@ const Dashboard = () => {
                 <span className="hidden sm:inline">Trocar Servidor</span>
               </Button>
             </Link>
-              <Button onClick={handleLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            <Button onClick={handleLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
@@ -533,8 +535,7 @@ const Dashboard = () => {
               </Button>
             </div>
           )}
-
-          {/* ═══════════════ GLOBAL COMMUNICATION ═══════════════ */}
+                    {/* ═══════════════ GLOBAL COMMUNICATION ═══════════════ */}
           {activeTab === "communication" && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
@@ -630,8 +631,7 @@ const Dashboard = () => {
               </Button>
             </div>
           )}
-
-          {/* ═══════════════ TACTICAL MODERATION ═══════════════ */}
+                    {/* ═══════════════ TACTICAL MODERATION ═══════════════ */}
           {activeTab === "moderation" && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 mb-2">
@@ -726,7 +726,6 @@ const Dashboard = () => {
     </div>
   );
 };
-
 /* ──────────────────── SUB-COMPONENTS ──────────────────── */
 
 const StatCard = ({
