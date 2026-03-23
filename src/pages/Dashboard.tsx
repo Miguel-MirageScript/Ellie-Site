@@ -44,6 +44,11 @@ const Dashboard = () => {
   const [idiomasAtivos, setIdiomasAtivos] = useState(0);
   const [ameacasBloqueadas, setAmeacasBloqueadas] = useState(0);
 
+  // Time Zones states (from DB)
+  const [tzAmericas, setTzAmericas] = useState(33);
+  const [tzEuropa, setTzEuropa] = useState(33);
+  const [tzAsia, setTzAsia] = useState(34);
+
   // Module states
   const [modTraducao, setModTraducao] = useState(true);
   const [modIntelligence, setModIntelligence] = useState(true);
@@ -97,6 +102,11 @@ const Dashboard = () => {
           if (data.online_count !== undefined) setOnlineCount(data.online_count);
           if (data.idiomas_ativos !== undefined) setIdiomasAtivos(data.idiomas_ativos);
           if (data.ameacas_bloqueadas !== undefined) setAmeacasBloqueadas(data.ameacas_bloqueadas);
+
+          // Time Zones
+          if (data.tz_americas !== undefined) setTzAmericas(data.tz_americas);
+          if (data.tz_europa !== undefined) setTzEuropa(data.tz_europa);
+          if (data.tz_asia !== undefined) setTzAsia(data.tz_asia);
 
           // Modules
           if (data.mod_traducao !== undefined) setModTraducao(data.mod_traducao);
@@ -309,6 +319,9 @@ const Dashboard = () => {
               onlineCount={onlineCount}
               idiomasAtivos={idiomasAtivos}
               ameacasBloqueadas={ameacasBloqueadas}
+              tzAmericas={tzAmericas}
+              tzEuropa={tzEuropa}
+              tzAsia={tzAsia}
               modTraducao={modTraducao}
               setModTraducao={setModTraducao}
               modIntelligence={modIntelligence}
@@ -377,4 +390,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-      
+                  
