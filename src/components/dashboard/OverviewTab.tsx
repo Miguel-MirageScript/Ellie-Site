@@ -2,12 +2,6 @@ import { Users, Eye, Globe, Shield, Save, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
-const timeZoneData = [
-  { zone: "Américas", pct: 55, color: "hsl(30 95% 50%)" },
-  { zone: "Europa", pct: 28, color: "hsl(25 100% 55%)" },
-  { zone: "Ásia", pct: 17, color: "hsl(0 0% 50%)" },
-];
-
 const StatCard = ({
   icon,
   label,
@@ -33,6 +27,9 @@ interface OverviewTabProps {
   onlineCount: number;
   idiomasAtivos: number;
   ameacasBloqueadas: number;
+  tzAmericas: number;
+  tzEuropa: number;
+  tzAsia: number;
   modTraducao: boolean;
   setModTraducao: (v: boolean) => void;
   modIntelligence: boolean;
@@ -54,6 +51,9 @@ const OverviewTab = ({
   onlineCount,
   idiomasAtivos,
   ameacasBloqueadas,
+  tzAmericas,
+  tzEuropa,
+  tzAsia,
   modTraducao,
   setModTraducao,
   modIntelligence,
@@ -74,6 +74,18 @@ const OverviewTab = ({
     { name: "Moderação Tática", checked: modModeracao, onChange: setModModeracao },
     { name: "Alertas de Eventos", checked: modAlertas, onChange: setModAlertas },
   ];
+
+  const timeZoneData = [
+    { zone: "Américas", pct: tzAmericas, color: "hsl(30 95% 50%)" },
+    { zone: "Europa", pct: tzEuropa, color: "hsl(25 100% 55%)" },
+    { zone: "Ásia", pct: tzAsia, color: "hsl(0 0% 50%)" },
+  ];
+
+  // Cálculos matemáticos para desenhar o gráfico SVG
+  const circ = 88; // Circunferência de um círculo de raio 14 (2 * pi * 14)
+  const amDash = (tzAmericas / 100) * circ;
+  const euDash = (tzEuropa / 100) * circ;
+  const asDash = (tzAsia / 100) * circ;
 
   return (
     <div className="space-y-6">
@@ -129,17 +141,21 @@ const OverviewTab = ({
             </div>
           ))}
         </div>
-        {/* Donut visual */}
+        
+        {/* Gráfico Donut Dinâmico */}
         <div className="flex items-center justify-center mt-6">
           <div className="relative w-32 h-32">
             <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
               <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 14%)" strokeWidth="3" />
+              
               <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(30 95% 50%)" strokeWidth="3"
-                strokeDasharray="55 45" strokeDashoffset="0" className="drop-shadow-[0_0_6px_hsl(30_95%_50%_/_0.6)]" />
+                strokeDasharray={`${amDash} ${circ}`} strokeDashoffset="0" className="drop-shadow-[0_0_6px_hsl(30_95%_50%_/_0.6)] transition-all duration-1000" />
+              
               <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(25 100% 55%)" strokeWidth="3"
-                strokeDasharray="28 72" strokeDashoffset="-55" className="drop-shadow-[0_0_6px_hsl(25_100%_55%_/_0.6)]" />
+                strokeDasharray={`${euDash} ${circ}`} strokeDashoffset={-amDash} className="drop-shadow-[0_0_6px_hsl(25_100%_55%_/_0.6)] transition-all duration-1000" />
+              
               <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 50%)" strokeWidth="3"
-                strokeDasharray="17 83" strokeDashoffset="-83" />
+                strokeDasharray={`${asDash} ${circ}`} strokeDashoffset={-(amDash + euDash)} className="transition-all duration-1000" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="font-display text-xs text-primary font-bold">3 ZONAS</span>
@@ -180,4 +196,3 @@ const OverviewTab = ({
 };
 
 export default OverviewTab;
-          
