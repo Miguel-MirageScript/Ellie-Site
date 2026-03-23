@@ -1,6 +1,7 @@
 import { Users, Eye, Globe, Shield, Save, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import AllianceTimeZones from "./AllianceTimeZones";
 
 const StatCard = ({
   icon,
@@ -75,18 +76,6 @@ const OverviewTab = ({
     { name: "Alertas de Eventos", checked: modAlertas, onChange: setModAlertas },
   ];
 
-  const timeZoneData = [
-    { zone: "Américas", pct: tzAmericas, color: "hsl(30 95% 50%)" },
-    { zone: "Europa", pct: tzEuropa, color: "hsl(25 100% 55%)" },
-    { zone: "Ásia", pct: tzAsia, color: "hsl(0 0% 50%)" },
-  ];
-
-  // Cálculos matemáticos para desenhar o gráfico SVG
-  const circ = 88; // Circunferência de um círculo de raio 14 (2 * pi * 14)
-  const amDash = (tzAmericas / 100) * circ;
-  const euDash = (tzEuropa / 100) * circ;
-  const asDash = (tzAsia / 100) * circ;
-
   return (
     <div className="space-y-6">
       {/* Server Header */}
@@ -116,53 +105,12 @@ const OverviewTab = ({
         <StatCard icon={<Shield className="h-5 w-5" />} label="Ameaças Bloqueadas" value={ameacasBloqueadas.toLocaleString("pt-BR")} />
       </div>
 
-      {/* Alliance Time Zones Chart */}
-      <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
-        <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5">
-          FUSOS HORÁRIOS DA ALIANÇA
-        </h3>
-        <div className="space-y-4">
-          {timeZoneData.map((tz) => (
-            <div key={tz.zone}>
-              <div className="flex justify-between text-xs mb-1.5">
-                <span className="text-foreground font-display tracking-wider">{tz.zone.toUpperCase()}</span>
-                <span className="text-primary font-mono">{tz.pct}%</span>
-              </div>
-              <div className="w-full h-3 rounded-full bg-muted/40 overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-1000"
-                  style={{
-                    width: `${tz.pct}%`,
-                    background: `linear-gradient(90deg, ${tz.color}, ${tz.color}88)`,
-                    boxShadow: `0 0 12px ${tz.color}66`,
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Gráfico Donut Dinâmico */}
-        <div className="flex items-center justify-center mt-6">
-          <div className="relative w-32 h-32">
-            <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 14%)" strokeWidth="3" />
-              
-              <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(30 95% 50%)" strokeWidth="3"
-                strokeDasharray={`${amDash} ${circ}`} strokeDashoffset="0" className="drop-shadow-[0_0_6px_hsl(30_95%_50%_/_0.6)] transition-all duration-1000" />
-              
-              <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(25 100% 55%)" strokeWidth="3"
-                strokeDasharray={`${euDash} ${circ}`} strokeDashoffset={-amDash} className="drop-shadow-[0_0_6px_hsl(25_100%_55%_/_0.6)] transition-all duration-1000" />
-              
-              <circle cx="18" cy="18" r="14" fill="none" stroke="hsl(0 0% 50%)" strokeWidth="3"
-                strokeDasharray={`${asDash} ${circ}`} strokeDashoffset={-(amDash + euDash)} className="transition-all duration-1000" />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-display text-xs text-primary font-bold">3 ZONAS</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Alliance Time Zones Chart (NOVO MÓDULO IMPORTADO) */}
+      <AllianceTimeZones 
+        tzAmericas={tzAmericas} 
+        tzEuropa={tzEuropa} 
+        tzAsia={tzAsia} 
+      />
 
       {/* Module Status */}
       <div className="card-apocalyptic bg-background/60 backdrop-blur-md p-6">
@@ -196,3 +144,4 @@ const OverviewTab = ({
 };
 
 export default OverviewTab;
+                          
