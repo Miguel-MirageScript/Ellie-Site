@@ -14,19 +14,6 @@ import LssTab from "@/components/dashboard/LssTab";
 import CommunicationTab from "@/components/dashboard/CommunicationTab";
 import ModerationTab from "@/components/dashboard/ModerationTab";
 
-/* ──────────────────── MOCK DATA ──────────────────── */
-
-const reactionFlagsDefault = [
-  { emoji: "🇧🇷", lang: "Português", active: true },
-  { emoji: "🇺🇸", lang: "Inglês", active: true },
-  { emoji: "🇪🇸", lang: "Espanhol", active: true },
-  { emoji: "🇷🇺", lang: "Russo", active: false },
-  { emoji: "🇫🇷", lang: "Francês", active: false },
-  { emoji: "🇩🇪", lang: "Alemão", active: false },
-  { emoji: "🇨🇳", lang: "Chinês", active: false },
-  { emoji: "🇯🇵", lang: "Japonês", active: false },
-];
-
 const SERVER_ID = "servidor_teste_999";
 
 /* ──────────────────── TYPES ──────────────────── */
@@ -70,10 +57,8 @@ const Dashboard = () => {
   const [doomsdayTargets, setDoomsdayTargets] = useState("Setor 7, Setor 12");
   const [safeZone, setSafeZone] = useState("Base Alpha");
 
-  // Communication State
-  const [reactionTranslations, setReactionTranslations] = useState(
-    reactionFlagsDefault.map((f) => ({ ...f }))
-  );
+  // Communication State (Nova Central de Idiomas)
+  const [idiomasConfigurados, setIdiomasConfigurados] = useState<string[]>([]);
   const [announcementText, setAnnouncementText] = useState("");
   const [announcementChannel, setAnnouncementChannel] = useState("");
 
@@ -126,9 +111,9 @@ const Dashboard = () => {
           if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
           if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
 
-          // Communication - reaction translations
-          if (data.reaction_translations) {
-            setReactionTranslations(data.reaction_translations);
+          // Communication (Nova Central de Idiomas)
+          if (data.idiomas_configurados) {
+            setIdiomasConfigurados(data.idiomas_configurados);
           }
 
           // Moderation
@@ -167,7 +152,7 @@ const Dashboard = () => {
         doomsday_targets: doomsdayTargets,
         safe_zone: safeZone,
         // Communication
-        reaction_translations: reactionTranslations,
+        idiomas_configurados: idiomasConfigurados,
         // Moderation
         blocked_words: blockedWords,
         anti_spam: antiSpam,
@@ -206,9 +191,9 @@ const Dashboard = () => {
     }
   };
 
-  const toggleReactionFlag = (emoji: string) => {
-    setReactionTranslations((prev) =>
-      prev.map((f) => (f.emoji === emoji ? { ...f, active: !f.active } : f))
+  const toggleIdioma = (id: string) => {
+    setIdiomasConfigurados((prev) =>
+      prev.includes(id) ? prev.filter((langId) => langId !== id) : [...prev, id]
     );
   };
 
@@ -356,8 +341,8 @@ const Dashboard = () => {
 
           {activeTab === "communication" && (
             <CommunicationTab
-              reactionTranslations={reactionTranslations}
-              toggleReactionFlag={toggleReactionFlag}
+              idiomasConfigurados={idiomasConfigurados}
+              toggleIdioma={toggleIdioma}
               announcementText={announcementText}
               setAnnouncementText={setAnnouncementText}
               announcementChannel={announcementChannel}
@@ -392,4 +377,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-  
+      
