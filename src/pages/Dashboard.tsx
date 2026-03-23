@@ -67,8 +67,10 @@ const Dashboard = () => {
   const [announcementText, setAnnouncementText] = useState("");
   const [announcementChannel, setAnnouncementChannel] = useState("");
 
-  // Moderation State
-  const [blockedWords, setBlockedWords] = useState("spam, hack, cheat");
+  // Moderation State - PADRÃO DE FÁBRICA ATUALIZADO
+  const [blockedWords, setBlockedWords] = useState(
+    "porra, caralho, puta, buceta, fdp, arrombado, merda, cuzão, cuzao, viado, fuck, shit, bitch, asshole, cunt, motherfucker, dick, cock, nigger, slut, mierda, puto, cabrón, cabron, pendejo, gilipollas, coño, marica, сука, блять, пиздец, хуй, cyka, blyat, merde, connard, salope, putain, scheiße, arschloch, hure, spam, hack, cheat"
+  );
   const [antiSpam, setAntiSpam] = useState(true);
   const [antiFlood, setAntiFlood] = useState(true);
   const [antiLink, setAntiLink] = useState(false);
@@ -390,4 +392,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-                  
+              
