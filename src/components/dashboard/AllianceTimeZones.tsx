@@ -22,6 +22,13 @@ const AllianceTimeZones = ({ tzAmericas, tzEuropa, tzAsia }: AllianceTimeZonesPr
     return new Intl.DateTimeFormat('pt-BR', { timeZone, hour: '2-digit', minute: '2-digit' }).format(time);
   };
 
+  // ⏱️ NOVO: Motor específico para o Horário do Last Shelter (UTC-2)
+  const getLssTime = () => {
+    const utc = time.getTime() + time.getTimezoneOffset() * 60000;
+    const lssDate = new Date(utc - 2 * 3600000); // Subtrai 2 horas do relógio global
+    return lssDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
+
   // Cálculos matemáticos para desenhar o gráfico SVG
   const circ = 88;
   const amDash = (tzAmericas / 100) * circ;
@@ -40,11 +47,11 @@ const AllianceTimeZones = ({ tzAmericas, tzEuropa, tzAsia }: AllianceTimeZonesPr
         <h3 className="font-display text-xs tracking-widest text-muted-foreground">
           FUSOS HORÁRIOS DA ALIANÇA
         </h3>
-        {/* Relógio Global UTC */}
-        <div className="flex items-center gap-1.5 bg-muted/30 px-2 py-1 rounded border border-border/50">
-          <Clock className="h-3 w-3 text-primary" />
-          <span className="text-[10px] font-mono text-foreground font-bold tracking-wider">
-            UTC {getTime('UTC')}
+        {/* Relógio Oficial do LSS (UTC-2) */}
+        <div className="flex items-center gap-1.5 bg-primary/20 px-2 py-1 rounded border border-primary/40 shadow-[0_0_8px_rgba(255,100,0,0.3)]">
+          <Clock className="h-3 w-3 text-primary animate-pulse" />
+          <span className="text-[10px] font-mono text-primary font-bold tracking-wider">
+            LSS TIME {getLssTime()}
           </span>
         </div>
       </div>
@@ -98,4 +105,3 @@ const AllianceTimeZones = ({ tzAmericas, tzEuropa, tzAsia }: AllianceTimeZonesPr
 };
 
 export default AllianceTimeZones;
-        
