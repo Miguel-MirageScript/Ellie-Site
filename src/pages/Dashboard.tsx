@@ -56,18 +56,28 @@ const Dashboard = () => {
   const [modModeracao, setModModeracao] = useState(false);
   const [modAlertas, setModAlertas] = useState(true);
 
-  // LSS State
+  // LSS State (Antigos)
   const [cozChestReminder, setCozChestReminder] = useState(true);
   const [killEventAlert, setKillEventAlert] = useState(true);
   const [doomsdayTargets, setDoomsdayTargets] = useState("Setor 7, Setor 12");
   const [safeZone, setSafeZone] = useState("Base Alpha");
+
+  // ⚔️ LSS State (NOVOS - Inteligência Automatizada)
+  const [lssCanalAnuncios, setLssCanalAnuncios] = useState("");
+  const [cozAtivo, setCozAtivo] = useState(false);
+  const [horaEmHoraAtivo, setHoraEmHoraAtivo] = useState(false);
+  const [warBoardTexto, setWarBoardTexto] = useState("");
+  const [keAtivo, setKeAtivo] = useState(false);
+  const [siegeAtivo, setSiegeAtivo] = useState(false);
+  const [balrogHorario, setBalrogHorario] = useState("");
+  const [lssRegrasNovatos, setLssRegrasNovatos] = useState("");
 
   // Communication State (Nova Central de Idiomas)
   const [idiomasConfigurados, setIdiomasConfigurados] = useState<string[]>([]);
   const [announcementText, setAnnouncementText] = useState("");
   const [announcementChannel, setAnnouncementChannel] = useState("");
 
-  // Moderation State - PADRÃO DE FÁBRICA ATUALIZADO
+  // Moderation State
   const [blockedWords, setBlockedWords] = useState(
     "porra, caralho, puta, buceta, fdp, arrombado, merda, cuzão, cuzao, viado, fuck, shit, bitch, asshole, cunt, motherfucker, dick, cock, nigger, slut, mierda, puto, cabrón, cabron, pendejo, gilipollas, coño, marica, сука, блять, пиздец, хуй, cyka, blyat, merde, connard, salope, putain, scheiße, arschloch, hure, spam, hack, cheat"
   );
@@ -117,16 +127,24 @@ const Dashboard = () => {
           if (data.mod_moderacao !== undefined) setModModeracao(data.mod_moderacao);
           if (data.mod_alertas !== undefined) setModAlertas(data.mod_alertas);
 
-          // LSS
+          // LSS (Antigos)
           if (data.coz_chest_reminder !== undefined) setCozChestReminder(data.coz_chest_reminder);
           if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
           if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
           if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
 
-          // Communication (Nova Central de Idiomas)
-          if (data.idiomas_configurados) {
-            setIdiomasConfigurados(data.idiomas_configurados);
-          }
+          // ⚔️ LSS (Novos)
+          if (data.lss_canal_anuncios !== undefined) setLssCanalAnuncios(data.lss_canal_anuncios);
+          if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
+          if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
+          if (data.war_board_texto !== undefined) setWarBoardTexto(data.war_board_texto);
+          if (data.ke_ativo !== undefined) setKeAtivo(data.ke_ativo);
+          if (data.siege_ativo !== undefined) setSiegeAtivo(data.siege_ativo);
+          if (data.balrog_horario !== undefined) setBalrogHorario(data.balrog_horario);
+          if (data.lss_regras_novatos !== undefined) setLssRegrasNovatos(data.lss_regras_novatos);
+
+          // Communication
+          if (data.idiomas_configurados) setIdiomasConfigurados(data.idiomas_configurados);
 
           // Moderation
           if (data.blocked_words !== undefined) setBlockedWords(data.blocked_words);
@@ -158,13 +176,26 @@ const Dashboard = () => {
         mod_comunicacao: modComunicacao,
         mod_moderacao: modModeracao,
         mod_alertas: modAlertas,
-        // LSS
+        
+        // LSS (Antigos)
         coz_chest_reminder: cozChestReminder,
         kill_event_alert: killEventAlert,
         doomsday_targets: doomsdayTargets,
         safe_zone: safeZone,
+        
+        // ⚔️ LSS (Novos)
+        lss_canal_anuncios: lssCanalAnuncios,
+        coz_ativo: cozAtivo,
+        hora_em_hora_ativo: horaEmHoraAtivo,
+        war_board_texto: warBoardTexto,
+        ke_ativo: keAtivo,
+        siege_ativo: siegeAtivo,
+        balrog_horario: balrogHorario,
+        lss_regras_novatos: lssRegrasNovatos,
+
         // Communication
         idiomas_configurados: idiomasConfigurados,
+        
         // Moderation
         blocked_words: blockedWords,
         anti_spam: antiSpam,
@@ -341,6 +372,7 @@ const Dashboard = () => {
 
           {activeTab === "lss" && (
             <LssTab
+              // Mantendo os dados antigos provisoriamente para não quebrar a tela atual
               cozChestReminder={cozChestReminder}
               setCozChestReminder={setCozChestReminder}
               killEventAlert={killEventAlert}
@@ -349,6 +381,18 @@ const Dashboard = () => {
               setDoomsdayTargets={setDoomsdayTargets}
               safeZone={safeZone}
               setSafeZone={setSafeZone}
+              
+              // ⚔️ Passando as novas chaves de guerra! (O TS vai chiar até arrumarmos o LssTab.tsx)
+              // @ts-ignore
+              lssCanalAnuncios={lssCanalAnuncios} setLssCanalAnuncios={setLssCanalAnuncios}
+              cozAtivo={cozAtivo} setCozAtivo={setCozAtivo}
+              horaEmHoraAtivo={horaEmHoraAtivo} setHoraEmHoraAtivo={setHoraEmHoraAtivo}
+              warBoardTexto={warBoardTexto} setWarBoardTexto={setWarBoardTexto}
+              keAtivo={keAtivo} setKeAtivo={setKeAtivo}
+              siegeAtivo={siegeAtivo} setSiegeAtivo={setSiegeAtivo}
+              balrogHorario={balrogHorario} setBalrogHorario={setBalrogHorario}
+              lssRegrasNovatos={lssRegrasNovatos} setLssRegrasNovatos={setLssRegrasNovatos}
+
               saving={saving}
               handleSave={handleSave}
             />
@@ -392,4 +436,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-              
+          
