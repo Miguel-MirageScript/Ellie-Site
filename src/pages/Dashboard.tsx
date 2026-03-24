@@ -67,6 +67,7 @@ const Dashboard = () => {
   const [cozAtivo, setCozAtivo] = useState(false);
   const [horaEmHoraAtivo, setHoraEmHoraAtivo] = useState(false);
   const [warBoardTexto, setWarBoardTexto] = useState("");
+  const [warBoardImagem, setWarBoardImagem] = useState(""); // 👈 NOVA GAVETA PARA A IMAGEM
   const [keAtivo, setKeAtivo] = useState(false);
   const [siegeAtivo, setSiegeAtivo] = useState(false);
   const [balrogHorario, setBalrogHorario] = useState("");
@@ -138,6 +139,7 @@ const Dashboard = () => {
           if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
           if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
           if (data.war_board_texto !== undefined) setWarBoardTexto(data.war_board_texto);
+          if (data.war_board_imagem !== undefined) setWarBoardImagem(data.war_board_imagem); // 👈 LENDO A IMAGEM DO BANCO
           if (data.ke_ativo !== undefined) setKeAtivo(data.ke_ativo);
           if (data.siege_ativo !== undefined) setSiegeAtivo(data.siege_ativo);
           if (data.balrog_horario !== undefined) setBalrogHorario(data.balrog_horario);
@@ -188,6 +190,7 @@ const Dashboard = () => {
         coz_ativo: cozAtivo,
         hora_em_hora_ativo: horaEmHoraAtivo,
         war_board_texto: warBoardTexto,
+        war_board_imagem: warBoardImagem, // 👈 ENVIANDO A IMAGEM PARA O BANCO
         ke_ativo: keAtivo,
         siege_ativo: siegeAtivo,
         balrog_horario: balrogHorario,
@@ -372,7 +375,6 @@ const Dashboard = () => {
 
           {activeTab === "lss" && (
             <LssTab
-              // Mantendo os dados antigos provisoriamente para não quebrar a tela atual
               cozChestReminder={cozChestReminder}
               setCozChestReminder={setCozChestReminder}
               killEventAlert={killEventAlert}
@@ -382,12 +384,14 @@ const Dashboard = () => {
               safeZone={safeZone}
               setSafeZone={setSafeZone}
               
-              // ⚔️ Passando as novas chaves de guerra! (O TS vai chiar até arrumarmos o LssTab.tsx)
-              // @ts-ignore
+              // ⚔️ Passando as chaves LSI para o componente LssTab
               lssCanalAnuncios={lssCanalAnuncios} setLssCanalAnuncios={setLssCanalAnuncios}
               cozAtivo={cozAtivo} setCozAtivo={setCozAtivo}
               horaEmHoraAtivo={horaEmHoraAtivo} setHoraEmHoraAtivo={setHoraEmHoraAtivo}
+              
               warBoardTexto={warBoardTexto} setWarBoardTexto={setWarBoardTexto}
+              warBoardImagem={warBoardImagem} setWarBoardImagem={setWarBoardImagem} // 👈 PASSANDO A IMAGEM!
+              
               keAtivo={keAtivo} setKeAtivo={setKeAtivo}
               siegeAtivo={siegeAtivo} setSiegeAtivo={setSiegeAtivo}
               balrogHorario={balrogHorario} setBalrogHorario={setBalrogHorario}
@@ -436,4 +440,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-          
+    
