@@ -1,14 +1,14 @@
 import { useState } from "react";
 import {
   Crosshair, Swords, AlertTriangle, Save, Loader2, BookOpen, Map,
-  MessageSquareWarning, Link as LinkIcon
+  MessageSquareWarning, Link as LinkIcon, Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
-// 📦 Importando nosso Sistema de Ajuda (Os textos e o Pop-up)
+// 📦 Importando nosso Sistema de Ajuda
 import { HelpModal } from "@/components/ui/HelpModal";
 import { 
   CanalAnunciosHelp, CozHelp, WarBoardHelp, AlarmesHelp, AcademiaHelp 
@@ -34,7 +34,6 @@ const ToggleRow = ({
   </div>
 );
 
-// 👇 O Botão "?" de Ajuda que fica no canto superior direito
 const HelpBtn = ({ onClick }: { onClick: () => void }) => (
   <button 
     onClick={onClick}
@@ -53,7 +52,6 @@ interface LssTabProps {
   cozAtivo: boolean; setCozAtivo: (v: boolean) => void;
   horaEmHoraAtivo: boolean; setHoraEmHoraAtivo: (v: boolean) => void;
   
-  // 🗺️ Quadro de Guerra (Texto + Imagem)
   warBoardTexto: string; setWarBoardTexto: (v: string) => void;
   warBoardImagem: string; setWarBoardImagem: (v: string) => void;
   
@@ -65,9 +63,9 @@ interface LssTabProps {
   saving: boolean;
   handleSave: () => void;
   
-  // Mantidos como opcionais
-  cozChestReminder?: boolean; setCozChestReminder?: (v: boolean) => void;
-  killEventAlert?: boolean; setKillEventAlert?: (v: boolean) => void;
+  // Handlers para o Upload de Imagem (Serão passados pelo Dashboard.tsx no próximo passo)
+  uploadingImage?: boolean;
+  handleImageUpload?: (file: File) => void;
 }
 
 const LssTab = ({
@@ -83,15 +81,24 @@ const LssTab = ({
   balrogHorario, setBalrogHorario,
   lssRegrasNovatos, setLssRegrasNovatos,
   saving, handleSave,
+  uploadingImage = false,
+  handleImageUpload,
 }: LssTabProps) => {
 
-  // 🧠 Controlador de qual Janela de Ajuda está aberta
   const [activeHelp, setActiveHelp] = useState<string | null>(null);
+
+  // Função para interceptar o arquivo selecionado no botão de Upload
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      if (handleImageUpload) {
+        handleImageUpload(e.target.files[0]);
+      }
+    }
+  };
 
   return (
     <div className="space-y-6">
       
-      {/* 🔮 GERENCIADOR DE MODAIS (Pop-ups de Ajuda) */}
       <HelpModal isOpen={activeHelp === "canal"} onClose={() => setActiveHelp(null)} title="ℹ️ Canal de Anúncios">
         <CanalAnunciosHelp />
       </HelpModal>
@@ -117,9 +124,6 @@ const LssTab = ({
         </div>
       </div>
 
-      {/* ==========================================
-          0. CONFIGURAÇÃO DE COMUNICAÇÃO LSS
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6 border-l-4 border-l-primary/80">
         <HelpBtn onClick={() => setActiveHelp("canal")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-4 flex items-center gap-2 pr-8">
@@ -139,9 +143,6 @@ const LssTab = ({
         </div>
       </div>
 
-      {/* ==========================================
-          1. PILAR 1: RADAR CLASH OF ZONES (COZ)
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("coz")} />
         <div className="flex items-center justify-between mb-5">
@@ -152,24 +153,11 @@ const LssTab = ({
         </div>
         
         <div className="space-y-4">
-          <ToggleRow 
-            label="Dicas Automáticas do CoZ" 
-            desc="Às 00:00 (LSS Time), a Ellie anuncia o evento do dia com dicas avançadas." 
-            checked={cozAtivo} 
-            onChange={setCozAtivo} 
-          />
-          <ToggleRow 
-            label="Radar de Hora em Hora (Fase Sequencial)" 
-            desc="Alerta o chat 20 minutos antes de um evento chave para ativar bônus no tempo exato." 
-            checked={horaEmHoraAtivo} 
-            onChange={setHoraEmHoraAtivo} 
-          />
+          <ToggleRow label="Dicas Automáticas do CoZ" desc="Às 00:00 (LSS Time), a Ellie anuncia o evento do dia com dicas avançadas." checked={cozAtivo} onChange={setCozAtivo} />
+          <ToggleRow label="Radar de Hora em Hora (Fase Sequencial)" desc="Alerta o chat 20 minutos antes de um evento chave para ativar bônus no tempo exato." checked={horaEmHoraAtivo} onChange={setHoraEmHoraAtivo} />
         </div>
       </div>
 
-      {/* ==========================================
-          2. PILAR 2: TÁTICAS DOOMSDAY / EDEN
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("warboard")} />
         <div className="flex items-center justify-between mb-5">
@@ -192,28 +180,54 @@ const LssTab = ({
             />
           </div>
           
-          {/* 👇 CAIXA: LINK DA IMAGEM DO MAPA */}
-          <div className="pt-2 border-t border-border/20">
+          {/* 👇 CAIXA DE IMAGEM ATUALIZADA (Link Manual + Upload) */}
+          <div className="pt-4 border-t border-border/20">
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 flex items-center gap-1.5">
               <LinkIcon className="h-3.5 w-3.5 text-primary" />
-              LINK DO MAPA TÁTICO (Opcional)
+              ANEXAR IMAGEM (Opcional)
             </Label>
-            <p className="text-[10px] text-muted-foreground mb-2">
-              Cole o link de uma imagem (JPG, PNG, GIF) para a Ellie exibir um mapa gigante no Discord.
-            </p>
-            <Input
-              placeholder="Ex: https://i.imgur.com/mapa-doomsday.png"
-              value={warBoardImagem}
-              onChange={(e) => setWarBoardImagem(e.target.value)}
-              className="bg-muted/30 border-border/60 text-foreground w-full font-mono text-xs"
-            />
+            
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              {/* Botão de Upload Nativo escondido e acionado por uma Label estilizada */}
+              <Label className="cursor-pointer shrink-0">
+                <div className={`flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 border border-border/50 rounded text-xs font-display tracking-wider transition-colors ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin text-primary" /> : <Upload className="h-4 w-4 text-primary" />}
+                  {uploadingImage ? 'ENVIANDO...' : 'ENVIAR IMAGEM'}
+                </div>
+                <input 
+                  type="file" 
+                  accept="image/png, image/jpeg, image/gif" 
+                  className="hidden" 
+                  onChange={onFileChange}
+                  disabled={uploadingImage}
+                />
+              </Label>
+              
+              <span className="text-[10px] text-muted-foreground font-mono">OU</span>
+
+              <Input
+                placeholder="COLE AQUI O LINK DA SUA IMAGEM"
+                value={warBoardImagem}
+                onChange={(e) => setWarBoardImagem(e.target.value)}
+                className="bg-muted/30 border-border/60 text-foreground w-full font-mono text-[11px]"
+              />
+            </div>
+            
+            {/* Se houver um link de imagem salvo, mostra um pequeno preview no site! */}
+            {warBoardImagem && (
+              <div className="mt-3 relative inline-block">
+                <img 
+                  src={warBoardImagem} 
+                  alt="Preview" 
+                  className="h-24 w-auto rounded border border-primary/30 object-contain bg-black/50" 
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ==========================================
-          3. PILAR 3: SISTEMA DE ALARME GLOBAL
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("alarmes")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -222,36 +236,15 @@ const LssTab = ({
         </h3>
         
         <div className="space-y-4">
-          <ToggleRow 
-            label="Sirene: Kill Event (KE)" 
-            desc="Emite um alerta vermelho piscando horas antes do KE para todos levantarem escudos." 
-            checked={keAtivo} 
-            onChange={setKeAtivo} 
-          />
-          <ToggleRow 
-            label="Sirene: Cerco Zumbi (Zombie Siege)" 
-            desc="Alerta os membros para recolherem tropas para defenderem a base da aliança." 
-            checked={siegeAtivo} 
-            onChange={setSiegeAtivo} 
-          />
-          
+          <ToggleRow label="Sirene: Kill Event (KE)" desc="Emite alerta piscando horas antes do KE." checked={keAtivo} onChange={setKeAtivo} />
+          <ToggleRow label="Sirene: Cerco Zumbi (Zombie Siege)" desc="Alerta os membros para defenderem a base." checked={siegeAtivo} onChange={setSiegeAtivo} />
           <div className="pt-2 border-t border-border/20">
-            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">
-              AGENDAR DESPERTAR DO BALROG (UTC)
-            </Label>
-            <Input
-              placeholder="Ex: Sexta-feira às 18:30 UTC"
-              value={balrogHorario}
-              onChange={(e) => setBalrogHorario(e.target.value)}
-              className="bg-muted/30 border-border/60 text-foreground w-full sm:w-1/2"
-            />
+            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">AGENDAR DESPERTAR DO BALROG (UTC)</Label>
+            <Input placeholder="Ex: Sexta-feira às 18:30 UTC" value={balrogHorario} onChange={(e) => setBalrogHorario(e.target.value)} className="bg-muted/30 border-border/60 text-foreground w-full sm:w-1/2" />
           </div>
         </div>
       </div>
 
-      {/* ==========================================
-          4. PILAR 4: ACADEMIA LSS (SAFE ZONE)
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("academia")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -261,27 +254,12 @@ const LssTab = ({
         
         <div className="space-y-4">
           <div>
-            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">
-              COORDENADAS DA SAFE ZONE (Colmeia)
-            </Label>
-            <Input
-              placeholder="Ex: Estado #999 (X: 500, Y: 500) perto do AC1"
-              value={safeZone}
-              onChange={(e) => setSafeZone(e.target.value)}
-              className="bg-muted/30 border-border/60 text-foreground w-full sm:w-2/3"
-            />
+            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">COORDENADAS DA SAFE ZONE (Colmeia)</Label>
+            <Input placeholder="Ex: Estado #999 (X: 500, Y: 500) perto do AC1" value={safeZone} onChange={(e) => setSafeZone(e.target.value)} className="bg-muted/30 border-border/60 text-foreground w-full sm:w-2/3" />
           </div>
-
           <div>
-            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">
-              REGRAS GERAIS & NAP (Alianças Aliadas)
-            </Label>
-            <textarea
-              value={lssRegrasNovatos}
-              onChange={(e) => setLssRegrasNovatos(e.target.value)}
-              placeholder="Digite as alianças do NAP e as regras que todo novato deve saber..."
-              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-            />
+            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">REGRAS GERAIS & NAP (Alianças Aliadas)</Label>
+            <textarea value={lssRegrasNovatos} onChange={(e) => setLssRegrasNovatos(e.target.value)} placeholder="Digite as alianças do NAP..." className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50" />
           </div>
         </div>
       </div>
@@ -299,3 +277,4 @@ const LssTab = ({
 };
 
 export default LssTab;
+    
