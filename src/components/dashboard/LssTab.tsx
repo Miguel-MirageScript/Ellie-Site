@@ -55,7 +55,7 @@ interface LssTabProps {
   
   // 🗺️ Quadro de Guerra (Texto + Imagem)
   warBoardTexto: string; setWarBoardTexto: (v: string) => void;
-  warBoardImagem: string; setWarBoardImagem: (v: string) => void; // 👈 NOVA CHAVE AQUI
+  warBoardImagem: string; setWarBoardImagem: (v: string) => void;
   
   keAtivo: boolean; setKeAtivo: (v: boolean) => void;
   siegeAtivo: boolean; setSiegeAtivo: (v: boolean) => void;
@@ -65,7 +65,7 @@ interface LssTabProps {
   saving: boolean;
   handleSave: () => void;
   
-  // Mantidos como opcionais caso ainda existam no Dashboard.tsx pai
+  // Mantidos como opcionais
   cozChestReminder?: boolean; setCozChestReminder?: (v: boolean) => void;
   killEventAlert?: boolean; setKillEventAlert?: (v: boolean) => void;
 }
@@ -77,7 +77,7 @@ const LssTab = ({
   cozAtivo, setCozAtivo,
   horaEmHoraAtivo, setHoraEmHoraAtivo,
   warBoardTexto, setWarBoardTexto,
-  warBoardImagem, setWarBoardImagem, // 👈 RECEBENDO A IMAGEM
+  warBoardImagem, setWarBoardImagem,
   keAtivo, setKeAtivo,
   siegeAtivo, setSiegeAtivo,
   balrogHorario, setBalrogHorario,
@@ -192,7 +192,7 @@ const LssTab = ({
             />
           </div>
           
-          {/* 👇 NOVA CAIXA: LINK DA IMAGEM DO MAPA */}
+          {/* 👇 CAIXA: LINK DA IMAGEM DO MAPA */}
           <div className="pt-2 border-t border-border/20">
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 flex items-center gap-1.5">
               <LinkIcon className="h-3.5 w-3.5 text-primary" />
@@ -260,4 +260,42 @@ const LssTab = ({
         </h3>
         
         <div className="space-y-4">
-          
+          <div>
+            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">
+              COORDENADAS DA SAFE ZONE (Colmeia)
+            </Label>
+            <Input
+              placeholder="Ex: Estado #999 (X: 500, Y: 500) perto do AC1"
+              value={safeZone}
+              onChange={(e) => setSafeZone(e.target.value)}
+              className="bg-muted/30 border-border/60 text-foreground w-full sm:w-2/3"
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">
+              REGRAS GERAIS & NAP (Alianças Aliadas)
+            </Label>
+            <textarea
+              value={lssRegrasNovatos}
+              onChange={(e) => setLssRegrasNovatos(e.target.value)}
+              placeholder="Digite as alianças do NAP e as regras que todo novato deve saber..."
+              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            />
+          </div>
+        </div>
+      </div>
+
+      <Button
+        onClick={handleSave}
+        disabled={saving}
+        className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 w-full sm:w-auto"
+      >
+        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+        {saving ? "TRANSMITINDO ORDENS..." : "SALVAR TÁTICAS"}
+      </Button>
+    </div>
+  );
+};
+
+export default LssTab;
