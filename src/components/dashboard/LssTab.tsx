@@ -44,7 +44,6 @@ const HelpBtn = ({ onClick }: { onClick: () => void }) => (
   </button>
 );
 
-// 👇 Novo componente para desenhar a Caixa de ID do Canal de forma uniforme
 const ChannelInput = ({ value, onChange, placeholder = "Ex: 123456789012345678" }: { value: string, onChange: (v: string) => void, placeholder?: string }) => (
   <div className="mt-4 pt-3 border-t border-border/20">
     <Label className="text-[10px] text-primary/80 font-display tracking-widest mb-1.5 flex items-center gap-1.5 uppercase">
@@ -64,7 +63,6 @@ interface LssTabProps {
   doomsdayTargets: string; setDoomsdayTargets: (v: string) => void;
   safeZone: string; setSafeZone: (v: string) => void;
 
-  // 📡 CANAIS SETORIZADOS
   canalWarBoard: string; setCanalWarBoard: (v: string) => void;
   canalCoz: string; setCanalCoz: (v: string) => void;
   canalHoraEmHora: string; setCanalHoraEmHora: (v: string) => void;
@@ -85,26 +83,19 @@ interface LssTabProps {
 
   saving: boolean;
   handleSave: () => void;
-  
   uploadingImage?: boolean;
   handleImageUpload?: (file: File) => void;
 }
 
 const LssTab = ({
   doomsdayTargets, setDoomsdayTargets, safeZone, setSafeZone,
-  
-  canalWarBoard, setCanalWarBoard,
-  canalCoz, setCanalCoz,
-  canalHoraEmHora, setCanalHoraEmHora,
-  canalKe, setCanalKe,
-  canalSiege, setCanalSiege,
-  canalBalrog, setCanalBalrog,
-
+  canalWarBoard, setCanalWarBoard, canalCoz, setCanalCoz,
+  canalHoraEmHora, setCanalHoraEmHora, canalKe, setCanalKe,
+  canalSiege, setCanalSiege, canalBalrog, setCanalBalrog,
   cozAtivo, setCozAtivo, horaEmHoraAtivo, setHoraEmHoraAtivo,
   warBoardTexto, setWarBoardTexto, warBoardImagem, setWarBoardImagem,
   keAtivo, setKeAtivo, siegeAtivo, setSiegeAtivo,
   balrogHorario, setBalrogHorario, lssRegrasNovatos, setLssRegrasNovatos,
-  
   saving, handleSave, uploadingImage = false, handleImageUpload,
 }: LssTabProps) => {
 
@@ -149,9 +140,6 @@ const LssTab = ({
         Pode usar IDs de canais diferentes para cada função. Caso prefira concentrar tudo num único canal, basta colar o mesmo ID em todas as caixas.
       </div>
 
-      {/* ==========================================
-          1. PILAR 1: RADAR CLASH OF ZONES (COZ)
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("coz")} />
         <div className="flex items-center justify-between mb-5">
@@ -174,9 +162,6 @@ const LssTab = ({
         </div>
       </div>
 
-      {/* ==========================================
-          2. PILAR 2: TÁTICAS DOOMSDAY / EDEN
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("warboard")} />
         <div className="flex items-center justify-between mb-5">
@@ -226,9 +211,6 @@ const LssTab = ({
         </div>
       </div>
 
-      {/* ==========================================
-          3. PILAR 3: SISTEMA DE ALARME GLOBAL
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("alarmes")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -247,17 +229,16 @@ const LssTab = ({
             {siegeAtivo && <ChannelInput value={canalSiege} onChange={setCanalSiege} placeholder="ID do canal de alertas de Cerco" />}
           </div>
           
+          {/* 👇 CAIXA DO BALROG AGORA APARECE SEMPRE! */}
           <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">AGENDAR DESPERTAR DO BALROG (UTC)</Label>
             <Input placeholder="Ex: Sexta-feira às 18:30 UTC" value={balrogHorario} onChange={(e) => setBalrogHorario(e.target.value)} className="bg-muted/30 border-border/60 text-foreground w-full sm:w-1/2" />
-            {(balrogHorario.trim() !== "") && <ChannelInput value={canalBalrog} onChange={setCanalBalrog} placeholder="ID do canal do Balrog" />}
+            
+            <ChannelInput value={canalBalrog} onChange={setCanalBalrog} placeholder="ID do canal do Balrog" />
           </div>
         </div>
       </div>
 
-      {/* ==========================================
-          4. PILAR 4: ACADEMIA LSS (SAFE ZONE)
-      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("academia")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -290,4 +271,4 @@ const LssTab = ({
 };
 
 export default LssTab;
-              
+          
