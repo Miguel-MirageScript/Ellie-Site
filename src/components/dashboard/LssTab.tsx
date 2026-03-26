@@ -44,11 +44,34 @@ const HelpBtn = ({ onClick }: { onClick: () => void }) => (
   </button>
 );
 
+// 👇 Novo componente para desenhar a Caixa de ID do Canal de forma uniforme
+const ChannelInput = ({ value, onChange, placeholder = "Ex: 123456789012345678" }: { value: string, onChange: (v: string) => void, placeholder?: string }) => (
+  <div className="mt-4 pt-3 border-t border-border/20">
+    <Label className="text-[10px] text-primary/80 font-display tracking-widest mb-1.5 flex items-center gap-1.5 uppercase">
+      <MessageSquareWarning className="h-3 w-3" />
+      ID do Canal de Anúncios
+    </Label>
+    <Input
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="bg-background/40 border-border/40 text-foreground font-mono text-xs w-full sm:w-2/3 h-8"
+    />
+  </div>
+);
+
 interface LssTabProps {
   doomsdayTargets: string; setDoomsdayTargets: (v: string) => void;
   safeZone: string; setSafeZone: (v: string) => void;
 
-  lssCanalAnuncios: string; setLssCanalAnuncios: (v: string) => void;
+  // 📡 CANAIS SETORIZADOS
+  canalWarBoard: string; setCanalWarBoard: (v: string) => void;
+  canalCoz: string; setCanalCoz: (v: string) => void;
+  canalHoraEmHora: string; setCanalHoraEmHora: (v: string) => void;
+  canalKe: string; setCanalKe: (v: string) => void;
+  canalSiege: string; setCanalSiege: (v: string) => void;
+  canalBalrog: string; setCanalBalrog: (v: string) => void;
+
   cozAtivo: boolean; setCozAtivo: (v: boolean) => void;
   horaEmHoraAtivo: boolean; setHoraEmHoraAtivo: (v: boolean) => void;
   
@@ -63,36 +86,33 @@ interface LssTabProps {
   saving: boolean;
   handleSave: () => void;
   
-  // Handlers para o Upload de Imagem (Serão passados pelo Dashboard.tsx no próximo passo)
   uploadingImage?: boolean;
   handleImageUpload?: (file: File) => void;
 }
 
 const LssTab = ({
-  doomsdayTargets, setDoomsdayTargets,
-  safeZone, setSafeZone,
-  lssCanalAnuncios, setLssCanalAnuncios,
-  cozAtivo, setCozAtivo,
-  horaEmHoraAtivo, setHoraEmHoraAtivo,
-  warBoardTexto, setWarBoardTexto,
-  warBoardImagem, setWarBoardImagem,
-  keAtivo, setKeAtivo,
-  siegeAtivo, setSiegeAtivo,
-  balrogHorario, setBalrogHorario,
-  lssRegrasNovatos, setLssRegrasNovatos,
-  saving, handleSave,
-  uploadingImage = false,
-  handleImageUpload,
+  doomsdayTargets, setDoomsdayTargets, safeZone, setSafeZone,
+  
+  canalWarBoard, setCanalWarBoard,
+  canalCoz, setCanalCoz,
+  canalHoraEmHora, setCanalHoraEmHora,
+  canalKe, setCanalKe,
+  canalSiege, setCanalSiege,
+  canalBalrog, setCanalBalrog,
+
+  cozAtivo, setCozAtivo, horaEmHoraAtivo, setHoraEmHoraAtivo,
+  warBoardTexto, setWarBoardTexto, warBoardImagem, setWarBoardImagem,
+  keAtivo, setKeAtivo, siegeAtivo, setSiegeAtivo,
+  balrogHorario, setBalrogHorario, lssRegrasNovatos, setLssRegrasNovatos,
+  
+  saving, handleSave, uploadingImage = false, handleImageUpload,
 }: LssTabProps) => {
 
   const [activeHelp, setActiveHelp] = useState<string | null>(null);
 
-  // Função para interceptar o arquivo selecionado no botão de Upload
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      if (handleImageUpload) {
-        handleImageUpload(e.target.files[0]);
-      }
+      if (handleImageUpload) handleImageUpload(e.target.files[0]);
     }
   };
 
@@ -124,25 +144,14 @@ const LssTab = ({
         </div>
       </div>
 
-      <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6 border-l-4 border-l-primary/80">
-        <HelpBtn onClick={() => setActiveHelp("canal")} />
-        <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-4 flex items-center gap-2 pr-8">
-          <MessageSquareWarning className="h-4 w-4 text-primary" />
-          CANAL DE ANÚNCIOS DA ELLIE
-        </h3>
-        <div>
-          <Label className="text-[11px] text-muted-foreground tracking-wider mb-2 block">
-            ID DO CANAL DO DISCORD (Onde a Ellie vai mandar as dicas do CoZ, Alvos e Alertas)
-          </Label>
-          <Input
-            placeholder="Ex: 123456789012345678"
-            value={lssCanalAnuncios}
-            onChange={(e) => setLssCanalAnuncios(e.target.value)}
-            className="bg-muted/30 border-primary/20 text-foreground font-mono focus-visible:ring-primary/50 w-full sm:w-2/3"
-          />
-        </div>
+      <div className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/20 rounded p-3 mb-4">
+        <strong className="text-primary font-display tracking-widest block mb-1">DICA TÁTICA:</strong>
+        Pode usar IDs de canais diferentes para cada função. Caso prefira concentrar tudo num único canal, basta colar o mesmo ID em todas as caixas.
       </div>
 
+      {/* ==========================================
+          1. PILAR 1: RADAR CLASH OF ZONES (COZ)
+      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("coz")} />
         <div className="flex items-center justify-between mb-5">
@@ -153,17 +162,27 @@ const LssTab = ({
         </div>
         
         <div className="space-y-4">
-          <ToggleRow label="Dicas Automáticas do CoZ" desc="Às 00:00 (LSS Time), a Ellie anuncia o evento do dia com dicas avançadas." checked={cozAtivo} onChange={setCozAtivo} />
-          <ToggleRow label="Radar de Hora em Hora (Fase Sequencial)" desc="Alerta o chat 20 minutos antes de um evento chave para ativar bônus no tempo exato." checked={horaEmHoraAtivo} onChange={setHoraEmHoraAtivo} />
+          <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
+            <ToggleRow label="Dicas Automáticas do CoZ" desc="Às 00:00 (LSS Time), a Ellie anuncia o evento do dia com dicas avançadas." checked={cozAtivo} onChange={setCozAtivo} />
+            {cozAtivo && <ChannelInput value={canalCoz} onChange={setCanalCoz} placeholder="ID do canal de dicas do CoZ" />}
+          </div>
+
+          <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
+            <ToggleRow label="Radar de Hora em Hora (Fase Sequencial)" desc="Alerta o chat 20 minutos antes de um evento chave para ativar bônus no tempo exato." checked={horaEmHoraAtivo} onChange={setHoraEmHoraAtivo} />
+            {horaEmHoraAtivo && <ChannelInput value={canalHoraEmHora} onChange={setCanalHoraEmHora} placeholder="ID do canal de alertas horários" />}
+          </div>
         </div>
       </div>
 
+      {/* ==========================================
+          2. PILAR 2: TÁTICAS DOOMSDAY / EDEN
+      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("warboard")} />
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-display text-xs tracking-widest text-muted-foreground flex items-center gap-2 pr-8">
             <Map className="h-4 w-4 text-primary" />
-            QUADRO DE GUERRA (WAR BOARD - DOOMSDAY)
+            QUADRO DE GUERRA (WAR BOARD)
           </h3>
         </div>
         
@@ -175,59 +194,41 @@ const LssTab = ({
             <textarea
               value={warBoardTexto}
               onChange={(e) => setWarBoardTexto(e.target.value)}
-              placeholder="Ex: AC3 inimigo (X: 1200, Y: 450) às 20:00 UTC. Proibido atacar tiles da aliança [XYZ]..."
+              placeholder="Ex: AC3 inimigo (X: 1200, Y: 450) às 20:00 UTC..."
               className="flex min-h-[120px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             />
           </div>
           
-          {/* 👇 CAIXA DE IMAGEM ATUALIZADA (Link Manual + Upload) */}
-          <div className="pt-4 border-t border-border/20">
+          <div className="pt-2 border-t border-border/20">
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 flex items-center gap-1.5">
               <LinkIcon className="h-3.5 w-3.5 text-primary" />
               ANEXAR IMAGEM (Opcional)
             </Label>
-            
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-              {/* Botão de Upload Nativo escondido e acionado por uma Label estilizada */}
               <Label className="cursor-pointer shrink-0">
                 <div className={`flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 border border-border/50 rounded text-xs font-display tracking-wider transition-colors ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}>
                   {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin text-primary" /> : <Upload className="h-4 w-4 text-primary" />}
                   {uploadingImage ? 'ENVIANDO...' : 'ENVIAR IMAGEM'}
                 </div>
-                <input 
-                  type="file" 
-                  accept="image/png, image/jpeg, image/gif" 
-                  className="hidden" 
-                  onChange={onFileChange}
-                  disabled={uploadingImage}
-                />
+                <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={onFileChange} disabled={uploadingImage} />
               </Label>
-              
               <span className="text-[10px] text-muted-foreground font-mono">OU</span>
-
-              <Input
-                placeholder="COLE AQUI O LINK DA SUA IMAGEM"
-                value={warBoardImagem}
-                onChange={(e) => setWarBoardImagem(e.target.value)}
-                className="bg-muted/30 border-border/60 text-foreground w-full font-mono text-[11px]"
-              />
+              <Input placeholder="COLE AQUI O LINK DA SUA IMAGEM" value={warBoardImagem} onChange={(e) => setWarBoardImagem(e.target.value)} className="bg-muted/30 border-border/60 text-foreground w-full font-mono text-[11px]" />
             </div>
-            
-            {/* Se houver um link de imagem salvo, mostra um pequeno preview no site! */}
             {warBoardImagem && (
               <div className="mt-3 relative inline-block">
-                <img 
-                  src={warBoardImagem} 
-                  alt="Preview" 
-                  className="h-24 w-auto rounded border border-primary/30 object-contain bg-black/50" 
-                  onError={(e) => (e.currentTarget.style.display = 'none')}
-                />
+                <img src={warBoardImagem} alt="Preview" className="h-24 w-auto rounded border border-primary/30 object-contain bg-black/50" onError={(e) => (e.currentTarget.style.display = 'none')} />
               </div>
             )}
           </div>
+
+          <ChannelInput value={canalWarBoard} onChange={setCanalWarBoard} placeholder="ID do canal do Quadro de Guerra" />
         </div>
       </div>
 
+      {/* ==========================================
+          3. PILAR 3: SISTEMA DE ALARME GLOBAL
+      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("alarmes")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -236,15 +237,27 @@ const LssTab = ({
         </h3>
         
         <div className="space-y-4">
-          <ToggleRow label="Sirene: Kill Event (KE)" desc="Emite alerta piscando horas antes do KE." checked={keAtivo} onChange={setKeAtivo} />
-          <ToggleRow label="Sirene: Cerco Zumbi (Zombie Siege)" desc="Alerta os membros para defenderem a base." checked={siegeAtivo} onChange={setSiegeAtivo} />
-          <div className="pt-2 border-t border-border/20">
+          <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
+            <ToggleRow label="Sirene: Kill Event (KE)" desc="Emite alerta piscando horas antes do KE." checked={keAtivo} onChange={setKeAtivo} />
+            {keAtivo && <ChannelInput value={canalKe} onChange={setCanalKe} placeholder="ID do canal de alertas KE" />}
+          </div>
+
+          <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
+            <ToggleRow label="Sirene: Cerco Zumbi (Zombie Siege)" desc="Alerta os membros para defenderem a base." checked={siegeAtivo} onChange={setSiegeAtivo} />
+            {siegeAtivo && <ChannelInput value={canalSiege} onChange={setCanalSiege} placeholder="ID do canal de alertas de Cerco" />}
+          </div>
+          
+          <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">AGENDAR DESPERTAR DO BALROG (UTC)</Label>
             <Input placeholder="Ex: Sexta-feira às 18:30 UTC" value={balrogHorario} onChange={(e) => setBalrogHorario(e.target.value)} className="bg-muted/30 border-border/60 text-foreground w-full sm:w-1/2" />
+            {(balrogHorario.trim() !== "") && <ChannelInput value={canalBalrog} onChange={setCanalBalrog} placeholder="ID do canal do Balrog" />}
           </div>
         </div>
       </div>
 
+      {/* ==========================================
+          4. PILAR 4: ACADEMIA LSS (SAFE ZONE)
+      ========================================== */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("academia")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -277,4 +290,4 @@ const LssTab = ({
 };
 
 export default LssTab;
-    
+              
