@@ -54,7 +54,16 @@ const Dashboard = () => {
   const [doomsdayTargets, setDoomsdayTargets] = useState("Setor 7, Setor 12");
   const [safeZone, setSafeZone] = useState("Base Alpha");
 
-  const [lssCanalAnuncios, setLssCanalAnuncios] = useState("");
+  // ==========================================
+  // ⚔️ LSS Intelligence - Estados Individuais Setorizados
+  // ==========================================
+  const [canalWarBoard, setCanalWarBoard] = useState("");
+  const [canalCoz, setCanalCoz] = useState("");
+  const [canalHoraEmHora, setCanalHoraEmHora] = useState("");
+  const [canalKe, setCanalKe] = useState("");
+  const [canalSiege, setCanalSiege] = useState("");
+  const [canalBalrog, setCanalBalrog] = useState("");
+
   const [cozAtivo, setCozAtivo] = useState(false);
   const [horaEmHoraAtivo, setHoraEmHoraAtivo] = useState(false);
   const [warBoardTexto, setWarBoardTexto] = useState("");
@@ -75,7 +84,6 @@ const Dashboard = () => {
   const [welcomeMessage, setWelcomeMessage] = useState("Bem-vindo {user}!");
   const [autoRole, setAutoRole] = useState("member");
 
-  // 🔄 ESTADO DE UPLOAD DE IMAGEM (NOVO)
   const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
@@ -97,11 +105,20 @@ const Dashboard = () => {
           if (data.mod_comunicacao !== undefined) setModComunicacao(data.mod_comunicacao);
           if (data.mod_moderacao !== undefined) setModModeracao(data.mod_moderacao);
           if (data.mod_alertas !== undefined) setModAlertas(data.mod_alertas);
+          
           if (data.coz_chest_reminder !== undefined) setCozChestReminder(data.coz_chest_reminder);
           if (data.kill_event_alert !== undefined) setKillEventAlert(data.kill_event_alert);
           if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
           if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
-          if (data.lss_canal_anuncios !== undefined) setLssCanalAnuncios(data.lss_canal_anuncios);
+
+          // LSS Canais Setorizados
+          if (data.canal_warboard !== undefined) setCanalWarBoard(data.canal_warboard);
+          if (data.canal_coz !== undefined) setCanalCoz(data.canal_coz);
+          if (data.canal_hora_em_hora !== undefined) setCanalHoraEmHora(data.canal_hora_em_hora);
+          if (data.canal_ke !== undefined) setCanalKe(data.canal_ke);
+          if (data.canal_siege !== undefined) setCanalSiege(data.canal_siege);
+          if (data.canal_balrog !== undefined) setCanalBalrog(data.canal_balrog);
+
           if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
           if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
           if (data.war_board_texto !== undefined) setWarBoardTexto(data.war_board_texto);
@@ -110,6 +127,7 @@ const Dashboard = () => {
           if (data.siege_ativo !== undefined) setSiegeAtivo(data.siege_ativo);
           if (data.balrog_horario !== undefined) setBalrogHorario(data.balrog_horario);
           if (data.lss_regras_novatos !== undefined) setLssRegrasNovatos(data.lss_regras_novatos);
+          
           if (data.idiomas_configurados) setIdiomasConfigurados(data.idiomas_configurados);
           if (data.blocked_words !== undefined) setBlockedWords(data.blocked_words);
           if (data.anti_spam !== undefined) setAntiSpam(data.anti_spam);
@@ -130,7 +148,12 @@ const Dashboard = () => {
         id_servidor: SERVER_ID,
         mod_traducao: modTraducao, mod_intelligence: modIntelligence, mod_comunicacao: modComunicacao, mod_moderacao: modModeracao, mod_alertas: modAlertas,
         coz_chest_reminder: cozChestReminder, kill_event_alert: killEventAlert, doomsday_targets: doomsdayTargets, safe_zone: safeZone,
-        lss_canal_anuncios: lssCanalAnuncios, coz_ativo: cozAtivo, hora_em_hora_ativo: horaEmHoraAtivo,
+        
+        // Salvando os canais setorizados
+        canal_warboard: canalWarBoard, canal_coz: canalCoz, canal_hora_em_hora: canalHoraEmHora,
+        canal_ke: canalKe, canal_siege: canalSiege, canal_balrog: canalBalrog,
+        
+        coz_ativo: cozAtivo, hora_em_hora_ativo: horaEmHoraAtivo,
         war_board_texto: warBoardTexto, war_board_imagem: warBoardImagem,
         ke_ativo: keAtivo, siege_ativo: siegeAtivo, balrog_horario: balrogHorario, lss_regras_novatos: lssRegrasNovatos,
         idiomas_configurados: idiomasConfigurados, blocked_words: blockedWords, anti_spam: antiSpam, anti_flood: antiFlood, anti_link: antiLink, welcome_message: welcomeMessage, auto_role: autoRole,
@@ -142,42 +165,22 @@ const Dashboard = () => {
 
   const toggleIdioma = (id: string) => { setIdiomasConfigurados((prev) => prev.includes(id) ? prev.filter((langId) => langId !== id) : [...prev, id]); };
 
-  // 🚀 MOTOR DE UPLOAD PARA O SUPABASE (NOVO)
   const handleImageUpload = async (file: File) => {
     try {
       setUploadingImage(true);
-      
-      // Gera um nome único para a foto não sobrescrever as outras
       const fileExt = file.name.split('.').pop();
       const fileName = `${SERVER_ID}_${Date.now()}.${fileExt}`;
 
-      // Envia para o Armazém 'ellie-images'
-      const { error: uploadError } = await supabase.storage
-        .from('ellie-images')
-        .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
+      const { error: uploadError } = await supabase.storage.from('ellie-images').upload(fileName, file, { cacheControl: '3600', upsert: false });
       if (uploadError) throw uploadError;
 
-      // Pega o link público da foto que acabou de subir
-      const { data: { publicUrl } } = supabase.storage
-        .from('ellie-images')
-        .getPublicUrl(fileName);
-
-      // Coloca o link na caixinha de texto!
+      const { data: { publicUrl } } = supabase.storage.from('ellie-images').getPublicUrl(fileName);
       setWarBoardImagem(publicUrl);
       
-      toast({
-        title: "📸 Imagem carregada!",
-        description: "A imagem foi salva no servidor. Não se esqueça de clicar em 'Salvar Táticas'.",
-      });
-
+      toast({ title: "📸 Imagem carregada!", description: "A imagem foi salva no servidor. Não se esqueça de clicar em 'Salvar Táticas'." });
     } catch (error) {
       console.error("Erro no upload:", error);
-      toast({
-        title: "Erro ao enviar imagem",
-        description: "Verifique se a imagem é menor que 5MB e tente novamente.",
-        variant: "destructive",
-      });
+      toast({ title: "Erro ao enviar imagem", description: "Verifique se a imagem é menor que 5MB e tente novamente.", variant: "destructive" });
     } finally {
       setUploadingImage(false);
     }
@@ -187,7 +190,6 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background relative flex flex-col">
       <EmberParticles />
 
-      {/* Header */}
       <header className="relative z-30 border-b border-border/50 bg-background/60 backdrop-blur-xl flex-shrink-0">
         <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
@@ -212,7 +214,6 @@ const Dashboard = () => {
       </header>
 
       <div className="flex flex-1 relative z-20 overflow-hidden">
-        {/* Sidebar */}
         <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} fixed lg:relative z-30 lg:z-auto w-60 h-[calc(100vh-3.5rem)] bg-background/70 backdrop-blur-xl border-r border-border/50 transition-transform duration-300 flex-shrink-0 flex flex-col`}>
           <div className="p-4 border-b border-border/30"><div className="flex items-center gap-2 text-xs text-muted-foreground font-display tracking-widest"><Shield className="h-3.5 w-3.5 text-primary" />PAINEL TÁTICO</div></div>
           <nav className="flex-1 p-3 space-y-1">
@@ -230,7 +231,6 @@ const Dashboard = () => {
 
         {sidebarOpen && <div className="fixed inset-0 bg-background/60 z-20 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           {activeTab === "overview" && (
             <OverviewTab serverName={serverName} serverIcon={serverIcon} memberCount={memberCount} onlineCount={onlineCount} idiomasAtivos={idiomasAtivos} ameacasBloqueadas={ameacasBloqueadas} tzAmericas={tzAmericas} tzEuropa={tzEuropa} tzAsia={tzAsia} modTraducao={modTraducao} setModTraducao={setModTraducao} modIntelligence={modIntelligence} setModIntelligence={setModIntelligence} modComunicacao={modComunicacao} setModComunicacao={setModComunicacao} modModeracao={modModeracao} setModModeracao={setModModeracao} modAlertas={modAlertas} setModAlertas={setModAlertas} handleSave={handleSave} saving={saving} />
@@ -239,7 +239,14 @@ const Dashboard = () => {
           {activeTab === "lss" && (
             <LssTab
               cozChestReminder={cozChestReminder} setCozChestReminder={setCozChestReminder} killEventAlert={killEventAlert} setKillEventAlert={setKillEventAlert} doomsdayTargets={doomsdayTargets} setDoomsdayTargets={setDoomsdayTargets} safeZone={safeZone} setSafeZone={setSafeZone}
-              lssCanalAnuncios={lssCanalAnuncios} setLssCanalAnuncios={setLssCanalAnuncios}
+              
+              canalWarBoard={canalWarBoard} setCanalWarBoard={setCanalWarBoard}
+              canalCoz={canalCoz} setCanalCoz={setCanalCoz}
+              canalHoraEmHora={canalHoraEmHora} setCanalHoraEmHora={setCanalHoraEmHora}
+              canalKe={canalKe} setCanalKe={setCanalKe}
+              canalSiege={canalSiege} setCanalSiege={setCanalSiege}
+              canalBalrog={canalBalrog} setCanalBalrog={setCanalBalrog}
+              
               cozAtivo={cozAtivo} setCozAtivo={setCozAtivo}
               horaEmHoraAtivo={horaEmHoraAtivo} setHoraEmHoraAtivo={setHoraEmHoraAtivo}
               warBoardTexto={warBoardTexto} setWarBoardTexto={setWarBoardTexto}
@@ -250,7 +257,6 @@ const Dashboard = () => {
               lssRegrasNovatos={lssRegrasNovatos} setLssRegrasNovatos={setLssRegrasNovatos}
               saving={saving} handleSave={handleSave}
               
-              // 👇 PASSA O MOTOR DE UPLOAD PARA A ABA!
               uploadingImage={uploadingImage}
               handleImageUpload={handleImageUpload}
             />
@@ -270,4 +276,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-                                                                                                                     
+         
