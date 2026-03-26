@@ -62,7 +62,7 @@ interface LssTabProps {
   canalKe: string; setCanalKe: (v: string) => void;
   canalSiege: string; setCanalSiege: (v: string) => void;
   canalBalrog: string; setCanalBalrog: (v: string) => void;
-  canalAcademia: string; setCanalAcademia: (v: string) => void; // 👈 NOVO
+  canalAcademia: string; setCanalAcademia: (v: string) => void;
 
   cozAtivo: boolean; setCozAtivo: (v: boolean) => void;
   horaEmHoraAtivo: boolean; setHoraEmHoraAtivo: (v: boolean) => void;
@@ -71,7 +71,11 @@ interface LssTabProps {
   warBoardImagem: string; setWarBoardImagem: (v: string) => void;
   
   keAtivo: boolean; setKeAtivo: (v: boolean) => void;
+  keAlertaAntecipado: boolean; setKeAlertaAntecipado: (v: boolean) => void; // 👈 NOVO
+  
   siegeAtivo: boolean; setSiegeAtivo: (v: boolean) => void;
+  siegeHorario: string; setSiegeHorario: (v: string) => void; // 👈 NOVO
+  
   balrogHorario: string; setBalrogHorario: (v: string) => void;
   lssRegrasNovatos: string; setLssRegrasNovatos: (v: string) => void;
 
@@ -79,6 +83,7 @@ interface LssTabProps {
   handleSave: () => void;
   uploadingImage?: boolean;
   handleImageUpload?: (file: File) => void;
+  handleTriggerSiege: () => void; // 👈 NOVO (Botão de Pânico)
 }
 
 const LssTab = ({
@@ -89,9 +94,10 @@ const LssTab = ({
   canalAcademia, setCanalAcademia,
   cozAtivo, setCozAtivo, horaEmHoraAtivo, setHoraEmHoraAtivo,
   warBoardTexto, setWarBoardTexto, warBoardImagem, setWarBoardImagem,
-  keAtivo, setKeAtivo, siegeAtivo, setSiegeAtivo,
+  keAtivo, setKeAtivo, keAlertaAntecipado, setKeAlertaAntecipado,
+  siegeAtivo, setSiegeAtivo, siegeHorario, setSiegeHorario,
   balrogHorario, setBalrogHorario, lssRegrasNovatos, setLssRegrasNovatos,
-  saving, handleSave, uploadingImage = false, handleImageUpload,
+  saving, handleSave, uploadingImage = false, handleImageUpload, handleTriggerSiege
 }: LssTabProps) => {
 
   const [activeHelp, setActiveHelp] = useState<string | null>(null);
@@ -178,32 +184,70 @@ const LssTab = ({
         </div>
       </div>
 
-      <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
+      {/* 👇 NOVA SEÇÃO DE ALARMES */}
+      <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6 border-l-4 border-l-destructive/80">
         <HelpBtn onClick={() => setActiveHelp("alarmes")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
-          <AlertTriangle className="h-4 w-4 text-primary" />
-          SISTEMA DE ALARMES & EVENTOS
+          <AlertTriangle className="h-4 w-4 text-destructive" />
+          SISTEMA DE ALARMES & EVENTOS ESTRATÉGICOS
         </h3>
         <div className="space-y-4">
+          
+          {/* KE */}
           <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
-            <ToggleRow label="Sirene: Kill Event (KE)" desc="Emite alerta piscando horas antes do KE." checked={keAtivo} onChange={setKeAtivo} />
-            {keAtivo && <ChannelInput value={canalKe} onChange={setCanalKe} placeholder="ID do canal de alertas KE" />}
+            <ToggleRow label="Sirene: Kill Event (KE)" desc="Emite alerta automático nas sextas-feiras." checked={keAtivo} onChange={setKeAtivo} />
+            {keAtivo && (
+              <div className="ml-4 pl-4 border-l-2 border-primary/20 mt-2 space-y-3">
+                <ToggleRow label="Aviso Antecipado (3 Horas)" desc="Avisa a aliança às 20h00 para prepararem teletransportes e escudos." checked={keAlertaAntecipado} onChange={setKeAlertaAntecipado} />
+                <ChannelInput value={canalKe} onChange={setCanalKe} placeholder="ID do canal de alertas KE" />
+              </div>
+            )}
           </div>
+
+          {/* CERCO ZUMBI */}
           <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
             <ToggleRow label="Sirene: Cerco Zumbi (Zombie Siege)" desc="Alerta os membros para defenderem a base." checked={siegeAtivo} onChange={setSiegeAtivo} />
-            {siegeAtivo && <ChannelInput value={canalSiege} onChange={setCanalSiege} placeholder="ID do canal de alertas de Cerco" />}
+            {siegeAtivo && (
+              <div className="ml-4 pl-4 border-l-2 border-primary/20 mt-4 space-y-4">
+                <div>
+                  <Label className="text-xs text-foreground font-display tracking-wider mb-2 block text-primary">AGENDAR PRÓXIMO CERCO (Data e Hora Local)</Label>
+                  <Input 
+                    type="datetime-local" 
+                    value={siegeHorario} 
+                    onChange={(e) => setSiegeHorario(e.target.value)} 
+                    className="bg-background border-primary/30 text-foreground w-full sm:w-1/2 font-mono text-sm" 
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">A Ellie enviará um aviso 30 minutos antes do horário selecionado.</p>
+                </div>
+                
+                <div className="pt-2 pb-1">
+                  <Button onClick={handleTriggerSiege} variant="destructive" className="w-full sm:w-auto font-display tracking-widest gap-2 bg-red-900/80 hover:bg-red-600 border border-red-500/50">
+                    <AlertTriangle className="h-4 w-4" /> DISPARAR CERCO AGORA (MANUAL)
+                  </Button>
+                </div>
+
+                <ChannelInput value={canalSiege} onChange={setCanalSiege} placeholder="ID do canal de alertas de Cerco" />
+              </div>
+            )}
           </div>
+
+          {/* BALROG */}
           <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
-            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">AGENDAR DESPERTAR DO BALROG (UTC)</Label>
-            <Input placeholder="Ex: Sexta-feira às 18:30 UTC" value={balrogHorario} onChange={(e) => setBalrogHorario(e.target.value)} className="bg-muted/30 border-border/60 text-foreground w-full sm:w-1/2" />
+            <Label className="text-xs text-foreground font-display tracking-wider mb-2 block">AGENDAR DESPERTAR DO BALROG (Data e Hora Local)</Label>
+            <Input 
+              type="datetime-local" 
+              value={balrogHorario} 
+              onChange={(e) => setBalrogHorario(e.target.value)} 
+              className="bg-background border-border/60 text-foreground w-full sm:w-1/2 font-mono text-sm" 
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">A Ellie enviará avisos faltando 1 Hora e 15 Minutos para o evento.</p>
             <ChannelInput value={canalBalrog} onChange={setCanalBalrog} placeholder="ID do canal do Balrog" />
           </div>
+
         </div>
       </div>
 
-      {/* ==========================================
-          4. PILAR 4: ACADEMIA LSS (SAFE ZONE)
-      ========================================== */}
+      {/* PILAR 4: ACADEMIA LSS (SAFE ZONE) */}
       <div className="card-apocalyptic relative bg-background/60 backdrop-blur-md p-6">
         <HelpBtn onClick={() => setActiveHelp("academia")} />
         <h3 className="font-display text-xs tracking-widest text-muted-foreground mb-5 flex items-center gap-2 pr-8">
@@ -220,7 +264,6 @@ const LssTab = ({
             <textarea value={lssRegrasNovatos} onChange={(e) => setLssRegrasNovatos(e.target.value)} placeholder="Digite as alianças do NAP..." className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50" />
           </div>
           
-          {/* 👇 CAIXA DE ID PARA O MANUAL DE NOVATOS */}
           <ChannelInput value={canalAcademia} onChange={setCanalAcademia} placeholder="ID do canal de Regras/Academia" />
         </div>
       </div>
@@ -238,4 +281,3 @@ const LssTab = ({
 };
 
 export default LssTab;
-          
