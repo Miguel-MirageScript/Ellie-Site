@@ -61,7 +61,7 @@ const Dashboard = () => {
   const [canalKe, setCanalKe] = useState("");
   const [canalSiege, setCanalSiege] = useState("");
   const [canalBalrog, setCanalBalrog] = useState("");
-  const [canalAcademia, setCanalAcademia] = useState(""); // 👈 NOVO CANAL AQUI
+  const [canalAcademia, setCanalAcademia] = useState("");
 
   const [cozAtivo, setCozAtivo] = useState(false);
   const [horaEmHoraAtivo, setHoraEmHoraAtivo] = useState(false);
@@ -116,7 +116,7 @@ const Dashboard = () => {
           if (data.canal_ke !== undefined) setCanalKe(data.canal_ke);
           if (data.canal_siege !== undefined) setCanalSiege(data.canal_siege);
           if (data.canal_balrog !== undefined) setCanalBalrog(data.canal_balrog);
-          if (data.canal_academia !== undefined) setCanalAcademia(data.canal_academia); // 👈 LENDO O NOVO CANAL
+          if (data.canal_academia !== undefined) setCanalAcademia(data.canal_academia);
 
           if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
           if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
@@ -143,23 +143,39 @@ const Dashboard = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // 📦 Payload inicial com todas as configurações
       const payload = {
         id_servidor: SERVER_ID,
         mod_traducao: modTraducao, mod_intelligence: modIntelligence, mod_comunicacao: modComunicacao, mod_moderacao: modModeracao, mod_alertas: modAlertas,
         coz_chest_reminder: cozChestReminder, kill_event_alert: killEventAlert, doomsday_targets: doomsdayTargets, safe_zone: safeZone,
-        
         canal_warboard: canalWarBoard, canal_coz: canalCoz, canal_hora_em_hora: canalHoraEmHora,
-        canal_ke: canalKe, canal_siege: canalSiege, canal_balrog: canalBalrog, 
-        canal_academia: canalAcademia, // 👈 SALVANDO O NOVO CANAL
-        
+        canal_ke: canalKe, canal_siege: canalSiege, canal_balrog: canalBalrog, canal_academia: canalAcademia,
         coz_ativo: cozAtivo, hora_em_hora_ativo: horaEmHoraAtivo,
         war_board_texto: warBoardTexto, war_board_imagem: warBoardImagem,
         ke_ativo: keAtivo, siege_ativo: siegeAtivo, balrog_horario: balrogHorario, lss_regras_novatos: lssRegrasNovatos,
         idiomas_configurados: idiomasConfigurados, blocked_words: blockedWords, anti_spam: antiSpam, anti_flood: antiFlood, anti_link: antiLink, welcome_message: welcomeMessage, auto_role: autoRole,
       };
+
       const { error } = await supabase.from("configuracoes_servidor").upsert(payload, { onConflict: "id_servidor" });
-      if (!error) toast({ title: "✅ Configurações salvas!" });
-    } finally { setSaving(false); }
+      
+      if (!error) {
+        toast({ title: "✅ Ordens Transmitidas!" });
+        
+        // 🧹 LIMPEZA TÁTICA: Limpa os campos de texto e imagem do War Board localmente
+        setWarBoardTexto("");
+        setWarBoardImagem("");
+        
+        // Atualiza no banco para limpar permanentemente (evita que volte ao dar F5)
+        await supabase
+          .from("configuracoes_servidor")
+          .update({ war_board_texto: "", war_board_imagem: "" })
+          .eq("id_servidor", SERVER_ID);
+      }
+    } catch (err) {
+      toast({ title: "❌ Erro ao salvar", description: "Falha na conexão com a base de dados.", variant: "destructive" });
+    } finally { 
+      setSaving(false); 
+    }
   };
 
   const toggleIdioma = (id: string) => { setIdiomasConfigurados((prev) => prev.includes(id) ? prev.filter((langId) => langId !== id) : [...prev, id]); };
@@ -173,9 +189,9 @@ const Dashboard = () => {
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from('ellie-images').getPublicUrl(fileName);
       setWarBoardImagem(publicUrl);
-      toast({ title: "📸 Imagem carregada!", description: "A imagem foi salva no servidor. Não se esqueça de clicar em 'Salvar Táticas'." });
+      toast({ title: "📸 Imagem carregada!", description: "Link gerado com sucesso. Clique em 'Salvar Táticas' para enviar." });
     } catch (error) {
-      toast({ title: "Erro ao enviar imagem", description: "Verifique se a imagem é menor que 5MB e tente novamente.", variant: "destructive" });
+      toast({ title: "Erro no upload", description: "Tamanho máximo permitido: 5MB.", variant: "destructive" });
     } finally {
       setUploadingImage(false);
     }
@@ -225,15 +241,13 @@ const Dashboard = () => {
           {activeTab === "lss" && (
             <LssTab
               cozChestReminder={cozChestReminder} setCozChestReminder={setCozChestReminder} killEventAlert={killEventAlert} setKillEventAlert={setKillEventAlert} doomsdayTargets={doomsdayTargets} setDoomsdayTargets={setDoomsdayTargets} safeZone={safeZone} setSafeZone={setSafeZone}
-              
               canalWarBoard={canalWarBoard} setCanalWarBoard={setCanalWarBoard}
               canalCoz={canalCoz} setCanalCoz={setCanalCoz}
               canalHoraEmHora={canalHoraEmHora} setCanalHoraEmHora={setCanalHoraEmHora}
               canalKe={canalKe} setCanalKe={setCanalKe}
               canalSiege={canalSiege} setCanalSiege={setCanalSiege}
               canalBalrog={canalBalrog} setCanalBalrog={setCanalBalrog}
-              canalAcademia={canalAcademia} setCanalAcademia={setCanalAcademia} // 👈 PASSANDO O CANAL PARA A ABA
-              
+              canalAcademia={canalAcademia} setCanalAcademia={setCanalAcademia}
               cozAtivo={cozAtivo} setCozAtivo={setCozAtivo}
               horaEmHoraAtivo={horaEmHoraAtivo} setHoraEmHoraAtivo={setHoraEmHoraAtivo}
               warBoardTexto={warBoardTexto} setWarBoardTexto={setWarBoardTexto}
@@ -243,7 +257,6 @@ const Dashboard = () => {
               balrogHorario={balrogHorario} setBalrogHorario={setBalrogHorario}
               lssRegrasNovatos={lssRegrasNovatos} setLssRegrasNovatos={setLssRegrasNovatos}
               saving={saving} handleSave={handleSave}
-              
               uploadingImage={uploadingImage}
               handleImageUpload={handleImageUpload}
             />
@@ -263,4 +276,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-  
+      
