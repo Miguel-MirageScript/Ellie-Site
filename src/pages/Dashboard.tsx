@@ -54,15 +54,14 @@ const Dashboard = () => {
   const [doomsdayTargets, setDoomsdayTargets] = useState("Setor 7, Setor 12");
   const [safeZone, setSafeZone] = useState("Base Alpha");
 
-  // ==========================================
-  // ⚔️ LSS Intelligence - Estados Individuais Setorizados
-  // ==========================================
+  // 📡 Canais Setorizados
   const [canalWarBoard, setCanalWarBoard] = useState("");
   const [canalCoz, setCanalCoz] = useState("");
   const [canalHoraEmHora, setCanalHoraEmHora] = useState("");
   const [canalKe, setCanalKe] = useState("");
   const [canalSiege, setCanalSiege] = useState("");
   const [canalBalrog, setCanalBalrog] = useState("");
+  const [canalAcademia, setCanalAcademia] = useState(""); // 👈 NOVO CANAL AQUI
 
   const [cozAtivo, setCozAtivo] = useState(false);
   const [horaEmHoraAtivo, setHoraEmHoraAtivo] = useState(false);
@@ -111,13 +110,13 @@ const Dashboard = () => {
           if (data.doomsday_targets !== undefined) setDoomsdayTargets(data.doomsday_targets);
           if (data.safe_zone !== undefined) setSafeZone(data.safe_zone);
 
-          // LSS Canais Setorizados
           if (data.canal_warboard !== undefined) setCanalWarBoard(data.canal_warboard);
           if (data.canal_coz !== undefined) setCanalCoz(data.canal_coz);
           if (data.canal_hora_em_hora !== undefined) setCanalHoraEmHora(data.canal_hora_em_hora);
           if (data.canal_ke !== undefined) setCanalKe(data.canal_ke);
           if (data.canal_siege !== undefined) setCanalSiege(data.canal_siege);
           if (data.canal_balrog !== undefined) setCanalBalrog(data.canal_balrog);
+          if (data.canal_academia !== undefined) setCanalAcademia(data.canal_academia); // 👈 LENDO O NOVO CANAL
 
           if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
           if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
@@ -149,9 +148,9 @@ const Dashboard = () => {
         mod_traducao: modTraducao, mod_intelligence: modIntelligence, mod_comunicacao: modComunicacao, mod_moderacao: modModeracao, mod_alertas: modAlertas,
         coz_chest_reminder: cozChestReminder, kill_event_alert: killEventAlert, doomsday_targets: doomsdayTargets, safe_zone: safeZone,
         
-        // Salvando os canais setorizados
         canal_warboard: canalWarBoard, canal_coz: canalCoz, canal_hora_em_hora: canalHoraEmHora,
-        canal_ke: canalKe, canal_siege: canalSiege, canal_balrog: canalBalrog,
+        canal_ke: canalKe, canal_siege: canalSiege, canal_balrog: canalBalrog, 
+        canal_academia: canalAcademia, // 👈 SALVANDO O NOVO CANAL
         
         coz_ativo: cozAtivo, hora_em_hora_ativo: horaEmHoraAtivo,
         war_board_texto: warBoardTexto, war_board_imagem: warBoardImagem,
@@ -170,16 +169,12 @@ const Dashboard = () => {
       setUploadingImage(true);
       const fileExt = file.name.split('.').pop();
       const fileName = `${SERVER_ID}_${Date.now()}.${fileExt}`;
-
       const { error: uploadError } = await supabase.storage.from('ellie-images').upload(fileName, file, { cacheControl: '3600', upsert: false });
       if (uploadError) throw uploadError;
-
       const { data: { publicUrl } } = supabase.storage.from('ellie-images').getPublicUrl(fileName);
       setWarBoardImagem(publicUrl);
-      
       toast({ title: "📸 Imagem carregada!", description: "A imagem foi salva no servidor. Não se esqueça de clicar em 'Salvar Táticas'." });
     } catch (error) {
-      console.error("Erro no upload:", error);
       toast({ title: "Erro ao enviar imagem", description: "Verifique se a imagem é menor que 5MB e tente novamente.", variant: "destructive" });
     } finally {
       setUploadingImage(false);
@@ -193,13 +188,8 @@ const Dashboard = () => {
       <header className="relative z-30 border-b border-border/50 bg-background/60 backdrop-blur-xl flex-shrink-0">
         <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-muted-foreground hover:text-foreground lg:hidden">
-              <Menu className="h-5 w-5" />
-            </button>
-            <Link to="/" className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-primary" />
-              <span className="font-display text-xs font-bold tracking-wider text-foreground hidden sm:inline">ELLIE</span>
-            </Link>
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-muted-foreground hover:text-foreground lg:hidden"><Menu className="h-5 w-5" /></button>
+            <Link to="/" className="flex items-center gap-2"><Bot className="h-5 w-5 text-primary" /><span className="font-display text-xs font-bold tracking-wider text-foreground hidden sm:inline">ELLIE</span></Link>
             <span className="text-muted-foreground/40">/</span>
             <div className="flex items-center gap-2">
               {serverIcon.startsWith("http") ? <img src={serverIcon} alt="Server Icon" className="h-6 w-6 rounded-md object-cover" /> : <span className="text-xl">{serverIcon}</span>}
@@ -223,10 +213,6 @@ const Dashboard = () => {
               </button>
             ))}
           </nav>
-          <div className="p-4 border-t border-border/30">
-            <div className="text-[10px] text-muted-foreground/50 font-mono">ELLIE v2.4.1 // SISTEMA ONLINE</div>
-            <div className="mt-1 flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" /><span className="text-[10px] text-green-500/80 font-mono">OPERACIONAL</span></div>
-          </div>
         </aside>
 
         {sidebarOpen && <div className="fixed inset-0 bg-background/60 z-20 lg:hidden" onClick={() => setSidebarOpen(false)} />}
@@ -246,6 +232,7 @@ const Dashboard = () => {
               canalKe={canalKe} setCanalKe={setCanalKe}
               canalSiege={canalSiege} setCanalSiege={setCanalSiege}
               canalBalrog={canalBalrog} setCanalBalrog={setCanalBalrog}
+              canalAcademia={canalAcademia} setCanalAcademia={setCanalAcademia} // 👈 PASSANDO O CANAL PARA A ABA
               
               cozAtivo={cozAtivo} setCozAtivo={setCozAtivo}
               horaEmHoraAtivo={horaEmHoraAtivo} setHoraEmHoraAtivo={setHoraEmHoraAtivo}
@@ -276,4 +263,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-         
+  
