@@ -67,9 +67,14 @@ const Dashboard = () => {
   const [horaEmHoraAtivo, setHoraEmHoraAtivo] = useState(false);
   const [warBoardTexto, setWarBoardTexto] = useState("");
   const [warBoardImagem, setWarBoardImagem] = useState("");
+  
+  // ALARMES NOVOS
   const [keAtivo, setKeAtivo] = useState(false);
+  const [keAlertaAntecipado, setKeAlertaAntecipado] = useState(true);
   const [siegeAtivo, setSiegeAtivo] = useState(false);
+  const [siegeHorario, setSiegeHorario] = useState("");
   const [balrogHorario, setBalrogHorario] = useState("");
+  
   const [lssRegrasNovatos, setLssRegrasNovatos] = useState("");
 
   const [idiomasConfigurados, setIdiomasConfigurados] = useState<string[]>([]);
@@ -123,7 +128,9 @@ const Dashboard = () => {
           if (data.war_board_texto !== undefined) setWarBoardTexto(data.war_board_texto);
           if (data.war_board_imagem !== undefined) setWarBoardImagem(data.war_board_imagem);
           if (data.ke_ativo !== undefined) setKeAtivo(data.ke_ativo);
+          if (data.ke_alerta_antecipado !== undefined) setKeAlertaAntecipado(data.ke_alerta_antecipado);
           if (data.siege_ativo !== undefined) setSiegeAtivo(data.siege_ativo);
+          if (data.siege_horario !== undefined) setSiegeHorario(data.siege_horario);
           if (data.balrog_horario !== undefined) setBalrogHorario(data.balrog_horario);
           if (data.lss_regras_novatos !== undefined) setLssRegrasNovatos(data.lss_regras_novatos);
           
@@ -143,7 +150,6 @@ const Dashboard = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // 📦 Payload inicial com todas as configurações
       const payload = {
         id_servidor: SERVER_ID,
         mod_traducao: modTraducao, mod_intelligence: modIntelligence, mod_comunicacao: modComunicacao, mod_moderacao: modModeracao, mod_alertas: modAlertas,
@@ -152,7 +158,9 @@ const Dashboard = () => {
         canal_ke: canalKe, canal_siege: canalSiege, canal_balrog: canalBalrog, canal_academia: canalAcademia,
         coz_ativo: cozAtivo, hora_em_hora_ativo: horaEmHoraAtivo,
         war_board_texto: warBoardTexto, war_board_imagem: warBoardImagem,
-        ke_ativo: keAtivo, siege_ativo: siegeAtivo, balrog_horario: balrogHorario, lss_regras_novatos: lssRegrasNovatos,
+        ke_ativo: keAtivo, ke_alerta_antecipado: keAlertaAntecipado,
+        siege_ativo: siegeAtivo, siege_horario: siegeHorario, balrog_horario: balrogHorario,
+        lss_regras_novatos: lssRegrasNovatos,
         idiomas_configurados: idiomasConfigurados, blocked_words: blockedWords, anti_spam: antiSpam, anti_flood: antiFlood, anti_link: antiLink, welcome_message: welcomeMessage, auto_role: autoRole,
       };
 
@@ -160,12 +168,8 @@ const Dashboard = () => {
       
       if (!error) {
         toast({ title: "✅ Ordens Transmitidas!" });
-        
-        // 🧹 LIMPEZA TÁTICA: Limpa os campos de texto e imagem do War Board localmente
         setWarBoardTexto("");
         setWarBoardImagem("");
-        
-        // Atualiza no banco para limpar permanentemente (evita que volte ao dar F5)
         await supabase
           .from("configuracoes_servidor")
           .update({ war_board_texto: "", war_board_imagem: "" })
@@ -175,6 +179,24 @@ const Dashboard = () => {
       toast({ title: "❌ Erro ao salvar", description: "Falha na conexão com a base de dados.", variant: "destructive" });
     } finally { 
       setSaving(false); 
+    }
+  };
+
+  // 🚨 BOTÃO DE PÂNICO DO CERCO ZUMBI
+  const handleTriggerSiege = async () => {
+    try {
+      await supabase
+        .from("configuracoes_servidor")
+        .update({ trigger_siege_now: true })
+        .eq("id_servidor", SERVER_ID);
+      
+      toast({ 
+        title: "🚨 SIRENE ACIONADA!", 
+        description: "A Ellie está enviando o alerta de Cerco Zumbi no Discord agora mesmo.",
+        variant: "destructive" 
+      });
+    } catch (err) {
+      toast({ title: "Erro ao acionar sirene", variant: "destructive" });
     }
   };
 
@@ -253,12 +275,15 @@ const Dashboard = () => {
               warBoardTexto={warBoardTexto} setWarBoardTexto={setWarBoardTexto}
               warBoardImagem={warBoardImagem} setWarBoardImagem={setWarBoardImagem}
               keAtivo={keAtivo} setKeAtivo={setKeAtivo}
+              keAlertaAntecipado={keAlertaAntecipado} setKeAlertaAntecipado={setKeAlertaAntecipado}
               siegeAtivo={siegeAtivo} setSiegeAtivo={setSiegeAtivo}
+              siegeHorario={siegeHorario} setSiegeHorario={setSiegeHorario}
               balrogHorario={balrogHorario} setBalrogHorario={setBalrogHorario}
               lssRegrasNovatos={lssRegrasNovatos} setLssRegrasNovatos={setLssRegrasNovatos}
               saving={saving} handleSave={handleSave}
               uploadingImage={uploadingImage}
               handleImageUpload={handleImageUpload}
+              handleTriggerSiege={handleTriggerSiege}
             />
           )}
 
@@ -276,4 +301,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-      
+            
