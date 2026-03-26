@@ -125,8 +125,8 @@ const Dashboard = () => {
 
           if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
           if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
-          if (data.war_board_texto !== undefined) setWarBoardTexto(data.war_board_texto);
-          if (data.war_board_imagem !== undefined) setWarBoardImagem(data.war_board_imagem);
+          // IMPORTANTE: Não recarregamos o texto do war board ao dar F5 para não poluir a tela
+          
           if (data.ke_ativo !== undefined) setKeAtivo(data.ke_ativo);
           if (data.ke_alerta_antecipado !== undefined) setKeAlertaAntecipado(data.ke_alerta_antecipado);
           if (data.siege_ativo !== undefined) setSiegeAtivo(data.siege_ativo);
@@ -168,12 +168,12 @@ const Dashboard = () => {
       
       if (!error) {
         toast({ title: "✅ Ordens Transmitidas!" });
+        
+        // CORREÇÃO: Limpamos apenas a TELA localmente. A mensagem fica no banco para a Ellie ler!
         setWarBoardTexto("");
         setWarBoardImagem("");
-        await supabase
-          .from("configuracoes_servidor")
-          .update({ war_board_texto: "", war_board_imagem: "" })
-          .eq("id_servidor", SERVER_ID);
+        
+        // Removemos o comando que apagava a mensagem do Supabase instantaneamente.
       }
     } catch (err) {
       toast({ title: "❌ Erro ao salvar", description: "Falha na conexão com a base de dados.", variant: "destructive" });
@@ -182,7 +182,6 @@ const Dashboard = () => {
     }
   };
 
-  // 🚨 BOTÃO DE PÂNICO DO CERCO ZUMBI
   const handleTriggerSiege = async () => {
     try {
       await supabase
@@ -301,4 +300,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-    
+                
