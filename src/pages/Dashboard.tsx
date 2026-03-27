@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Bot, Server, LogOut, Eye, Globe, Crosshair,
-  Shield, Menu, ChevronRight,
+  Shield, Menu, ChevronRight, Milestone // 👈 Ícone Milestone adicionado
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EmberParticles from "@/components/EmberParticles";
@@ -13,14 +13,17 @@ import OverviewTab from "@/components/dashboard/OverviewTab";
 import LssTab from "@/components/dashboard/LssTab";
 import CommunicationTab from "@/components/dashboard/CommunicationTab";
 import ModerationTab from "@/components/dashboard/ModerationTab";
+import ReceptionTab from "@/components/dashboard/ReceptionTab"; // 👈 IMPORT DA ABA NOVA
 
 const SERVER_ID = "servidor_teste_999";
 
-type Tab = "overview" | "lss" | "communication" | "moderation";
+// 👈 Aba 'reception' adicionada ao tipo
+type Tab = "overview" | "lss" | "reception" | "communication" | "moderation"; 
 
 const sidebarItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "overview", label: "Visão Geral", icon: <Eye className="h-4 w-4" /> },
   { key: "lss", label: "LSS Intelligence", icon: <Crosshair className="h-4 w-4" /> },
+  { key: "reception", label: "Integração", icon: <Milestone className="h-4 w-4" /> }, // 👈 BOTÃO NO MENU LATERAL
   { key: "communication", label: "Comunicação", icon: <Globe className="h-4 w-4" /> },
   { key: "moderation", label: "Moderação", icon: <Shield className="h-4 w-4" /> },
 ];
@@ -125,7 +128,6 @@ const Dashboard = () => {
 
           if (data.coz_ativo !== undefined) setCozAtivo(data.coz_ativo);
           if (data.hora_em_hora_ativo !== undefined) setHoraEmHoraAtivo(data.hora_em_hora_ativo);
-          // IMPORTANTE: Não recarregamos o texto do war board ao dar F5 para não poluir a tela
           
           if (data.ke_ativo !== undefined) setKeAtivo(data.ke_ativo);
           if (data.ke_alerta_antecipado !== undefined) setKeAlertaAntecipado(data.ke_alerta_antecipado);
@@ -168,12 +170,8 @@ const Dashboard = () => {
       
       if (!error) {
         toast({ title: "✅ Ordens Transmitidas!" });
-        
-        // CORREÇÃO: Limpamos apenas a TELA localmente. A mensagem fica no banco para a Ellie ler!
         setWarBoardTexto("");
         setWarBoardImagem("");
-        
-        // Removemos o comando que apagava a mensagem do Supabase instantaneamente.
       }
     } catch (err) {
       toast({ title: "❌ Erro ao salvar", description: "Falha na conexão com a base de dados.", variant: "destructive" });
@@ -286,6 +284,11 @@ const Dashboard = () => {
             />
           )}
 
+          {/* 👇 RENDERIZAÇÃO DA NOSSA NOVA ABA DE RECEPÇÃO */}
+          {activeTab === "reception" && (
+            <ReceptionTab />
+          )}
+
           {activeTab === "communication" && (
             <CommunicationTab idiomasConfigurados={idiomasConfigurados} toggleIdioma={toggleIdioma} announcementText={announcementText} setAnnouncementText={setAnnouncementText} announcementChannel={announcementChannel} setAnnouncementChannel={setAnnouncementChannel} saving={saving} handleSave={handleSave} />
           )}
@@ -300,4 +303,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-                
+        
