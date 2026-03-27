@@ -81,33 +81,34 @@ const ReceptionTab = () => {
       </div>
 
       <div className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/20 rounded p-4 mb-4">
-        <strong className="text-primary font-display tracking-widest block mb-2">BRIEFING TÁTICO:</strong>
+        <strong className="text-primary font-display tracking-widest block mb-2 underline underline-offset-2">BRIEFING TÁTICO:</strong>
         Este sistema criará um canal blindado onde novatos e veteranos serão filtrados. A Ellie dará o tutorial interativo em mensagens fantasmas (invisíveis para os outros) antes de liberar o acesso à Base.
         
-        {/* BOTÃO DE INFORMAÇÃO DETALHADA */}
+        {/* 👇 BOTÃO DE INFORMAÇÃO DETALHADA - ATUALIZADO PARA MAIOR DESTAQUE */}
         <button 
           onClick={() => setShowDetails(!showDetails)} 
-          className="mt-3 flex items-center gap-1.5 text-primary/80 hover:text-primary transition-colors font-display tracking-wider text-[10px] uppercase bg-primary/10 px-2 py-1 rounded"
+          // Aumentei tamanho, dei borda forte e brilho (glow)
+          className="mt-4 flex items-center gap-2 text-primary bg-background/90 border-2 border-primary/60 hover:border-primary transition-all duration-300 font-display tracking-wider text-[11px] uppercase px-4 py-2.5 rounded-full shadow-[0_0_15px_rgba(235,94,40,0.15)] glow-button-xs"
         >
-          <Info className="h-3 w-3" />
+          <Info className="h-3.5 w-3.5 shrink-0" />
           {showDetails ? "Ocultar Detalhes da Operação" : "Como funciona este sistema?"}
-          {showDetails ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+          {showDetails ? <ChevronUp className="h-4 w-4 ml-1 shrink-0" /> : <ChevronDown className="h-4 w-4 ml-1 shrink-0" />}
         </button>
 
         {/* PAINEL EXPANSÍVEL DE DETALHES */}
         {showDetails && (
-          <div className="mt-3 bg-black/40 border border-primary/30 p-4 rounded-md space-y-3 text-xs leading-relaxed animate-in fade-in slide-in-from-top-2">
-            <p><strong className="text-primary">🚧 A Fronteira:</strong> O jogador entra no servidor e vê apenas uma mensagem fixa da Ellie: <em>"Identifique-se na guarita."</em> com botões de <strong>Novato</strong> e <strong>Veterano</strong>.</p>
+          <div className="mt-4 bg-black/50 border-2 border-dashed border-primary/40 p-5 rounded-lg space-y-3.5 text-xs leading-relaxed animate-in fade-in slide-in-from-top-3">
+            <p><strong className="text-primary font-bold">🚧 A Fronteira:</strong> O jogador entra no servidor e vê apenas uma mensagem fixa da Ellie: <em>"Identifique-se na guarita."</em> com botões de <strong>Novato</strong> e <strong>Veterano</strong>.</p>
             
-            <p><strong className="text-primary">⏩ ROTA 1 (Veterano):</strong> A Ellie envia uma mensagem fantasma dando as boas-vindas. Ensina o jogador a traduzir mensagens reagindo com a bandeira de seu país e pede para ele selecionar seu idioma. Ao escolher, o servidor se abre.</p>
+            <p><strong className="text-primary font-bold">⏩ ROTA 1 (Veterano):</strong> A Ellie envia uma mensagem fantasma dando as boas-vindas. Ensina o jogador a traduzir mensagens reagindo com a bandeira de seu país e pede para ele selecionar seu idioma. Ao escolher, o servidor se abre.</p>
             
-            <p><strong className="text-primary">🔰 ROTA 2 (Tutorial do Novato):</strong> A Ellie inicia o Briefing interativo em mensagens que só o jogador vê:</p>
-            <ul className="list-disc pl-5 space-y-1.5 text-muted-foreground/80">
-              <li><strong className="text-foreground">Tela 1:</strong> Explica por que a aliança usa o Discord (Texto customizável abaixo).</li>
-              <li><strong className="text-foreground">Tela 2:</strong> Ensina sobre sobrevivência, o que é NAP e menciona o Canal de Regras.</li>
-              <li><strong className="text-foreground">Tela 3:</strong> A Ellie se apresenta como a Inteligência Artificial criada pelo veterano JIN WOO. Explica que sua função é tocar as sirenes (Cerco Zumbi, BLAZE DEMON, Kill Event) e traduzir o chat usando reações de bandeiras.</li>
-              <li><strong className="text-foreground">Tela 4:</strong> Direciona o recruta para o Canal da Academia LSS para abrir tickets de suporte.</li>
-              <li><strong className="text-foreground">Tela 5:</strong> O novato escolhe o idioma, ganha o crachá e o servidor é liberado!</li>
+            <p><strong className="text-primary font-bold">🔰 ROTA 2 (Tutorial do Novato):</strong> A Ellie inicia o Briefing interativo em mensagens que só o jogador vê:</p>
+            <ul className="list-disc pl-5 space-y-2 text-muted-foreground/90">
+              <li><strong className="text-foreground font-semibold">Tela 1:</strong> Explica por que a aliança usa o Discord (Texto customizável abaixo).</li>
+              <li><strong className="text-foreground font-semibold">Tela 2:</strong> Ensina sobre sobrevivência, o que é NAP e menciona o Canal de Regras.</li>
+              <li><strong className="text-foreground font-semibold">Tela 3:</strong> A Ellie se apresenta como a Inteligência Artificial criada pelo veterano JIN WOO. Explica que sua função é tocar as sirenes (Cerco Zumbi, BLAZE DEMON, Kill Event) e traduzir o chat usando reações de bandeiras.</li>
+              <li><strong className="text-foreground font-semibold">Tela 4:</strong> Direciona o recruta para o Canal da Academia LSS para abrir tickets de suporte.</li>
+              <li><strong className="text-foreground font-semibold">Tela 5:</strong> O novato escolhe o idioma, ganha o crachá e o servidor é liberado!</li>
             </ul>
           </div>
         )}
@@ -144,7 +145,6 @@ const ReceptionTab = () => {
             </div>
           </div>
 
-          {/* O Botão agora tem quebra de linha permitida (whitespace-normal) e altura automática */}
           <Button 
             onClick={handleSetupDiscord} 
             variant="outline" 
@@ -171,7 +171,7 @@ const ReceptionTab = () => {
               value={tutorialTela1} 
               onChange={(e) => setTutorialTela1(e.target.value)} 
               placeholder="Ex: O chat do jogo é fraco e apaga coordenadas. Nós usamos o Discord porque aqui é o nosso verdadeiro Quartel General..." 
-              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50 resize-y" 
+              className="flex min-h-[120px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50 resize-y" 
             />
           </div>
 
@@ -182,7 +182,7 @@ const ReceptionTab = () => {
               value={tutorialTela2} 
               onChange={(e) => setTutorialTela2(e.target.value)} 
               placeholder="Ex: Para sobreviver, você precisa saber o que é NAP. Não ataque alianças aliadas e leia o Quadro de Guerra antes de agir..." 
-              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50 resize-y" 
+              className="flex min-h-[120px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50 resize-y" 
             />
           </div>
 
