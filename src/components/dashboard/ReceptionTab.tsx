@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Milestone, Save, Loader2, MessageSquareWarning, ShieldAlert, BookOpen, Send } from "lucide-react";
+import { Milestone, Save, Loader2, MessageSquareWarning, ShieldAlert, BookOpen, Send, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ const ReceptionTab = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const [recepcaoAtiva, setRecepcaoAtiva] = useState(false);
   const [canalRecepcao, setCanalRecepcao] = useState("");
@@ -20,7 +21,6 @@ const ReceptionTab = () => {
   const [tutorialTela1, setTutorialTela1] = useState("");
   const [tutorialTela2, setTutorialTela2] = useState("");
 
-  // Busca os dados independentemente quando a aba é aberta
   useEffect(() => {
     const loadData = async () => {
       const { data, error } = await supabase.from("configuracoes_servidor").select("*").eq("id_servidor", SERVER_ID).maybeSingle();
@@ -80,9 +80,37 @@ const ReceptionTab = () => {
         </h2>
       </div>
 
-      <div className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/20 rounded p-3 mb-4">
-        <strong className="text-primary font-display tracking-widest block mb-1">BRIEFING TÁTICO:</strong>
-        Este sistema criará um canal blindado onde novatos e veteranos serão filtrados. A Ellie dará o tutorial interativo para os novatos antes de liberar o acesso à Base.
+      <div className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/20 rounded p-4 mb-4">
+        <strong className="text-primary font-display tracking-widest block mb-2">BRIEFING TÁTICO:</strong>
+        Este sistema criará um canal blindado onde novatos e veteranos serão filtrados. A Ellie dará o tutorial interativo em mensagens fantasmas (invisíveis para os outros) antes de liberar o acesso à Base.
+        
+        {/* BOTÃO DE INFORMAÇÃO DETALHADA */}
+        <button 
+          onClick={() => setShowDetails(!showDetails)} 
+          className="mt-3 flex items-center gap-1.5 text-primary/80 hover:text-primary transition-colors font-display tracking-wider text-[10px] uppercase bg-primary/10 px-2 py-1 rounded"
+        >
+          <Info className="h-3 w-3" />
+          {showDetails ? "Ocultar Detalhes da Operação" : "Como funciona este sistema?"}
+          {showDetails ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+        </button>
+
+        {/* PAINEL EXPANSÍVEL DE DETALHES */}
+        {showDetails && (
+          <div className="mt-3 bg-black/40 border border-primary/30 p-4 rounded-md space-y-3 text-xs leading-relaxed animate-in fade-in slide-in-from-top-2">
+            <p><strong className="text-primary">🚧 A Fronteira:</strong> O jogador entra no servidor e vê apenas uma mensagem fixa da Ellie: <em>"Identifique-se na guarita."</em> com botões de <strong>Novato</strong> e <strong>Veterano</strong>.</p>
+            
+            <p><strong className="text-primary">⏩ ROTA 1 (Veterano):</strong> A Ellie envia uma mensagem fantasma dando as boas-vindas. Ensina o jogador a traduzir mensagens reagindo com a bandeira de seu país e pede para ele selecionar seu idioma. Ao escolher, o servidor se abre.</p>
+            
+            <p><strong className="text-primary">🔰 ROTA 2 (Tutorial do Novato):</strong> A Ellie inicia o Briefing interativo em mensagens que só o jogador vê:</p>
+            <ul className="list-disc pl-5 space-y-1.5 text-muted-foreground/80">
+              <li><strong className="text-foreground">Tela 1:</strong> Explica por que a aliança usa o Discord (Texto customizável abaixo).</li>
+              <li><strong className="text-foreground">Tela 2:</strong> Ensina sobre sobrevivência, o que é NAP e menciona o Canal de Regras.</li>
+              <li><strong className="text-foreground">Tela 3:</strong> A Ellie se apresenta como a Inteligência Artificial criada pelo veterano JIN WOO. Explica que sua função é tocar as sirenes (Cerco Zumbi, BLAZE DEMON, Kill Event) e traduzir o chat usando reações de bandeiras.</li>
+              <li><strong className="text-foreground">Tela 4:</strong> Direciona o recruta para o Canal da Academia LSS para abrir tickets de suporte.</li>
+              <li><strong className="text-foreground">Tela 5:</strong> O novato escolhe o idioma, ganha o crachá e o servidor é liberado!</li>
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* CHAVE GERAL E CANAIS */}
@@ -104,20 +132,26 @@ const ReceptionTab = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-[10px] text-primary/80 font-display tracking-widest mb-1.5 flex items-center gap-1.5 uppercase">
-                <MessageSquareWarning className="h-3 w-3" /> ID Canal de Recepção (Obrigatório)
+                <MessageSquareWarning className="h-3 w-3 shrink-0" /> ID Canal Recepção (Obrigatório)
               </Label>
               <Input placeholder="Ex: 123456789" value={canalRecepcao} onChange={(e) => setCanalRecepcao(e.target.value)} className="bg-background/40 border-border/40 text-xs h-8" />
             </div>
             <div>
               <Label className="text-[10px] text-primary/80 font-display tracking-widest mb-1.5 flex items-center gap-1.5 uppercase">
-                <BookOpen className="h-3 w-3" /> ID Canal de Regras (Mencionado na Tela 2)
+                <BookOpen className="h-3 w-3 shrink-0" /> ID Canal de Regras (Mencionado no tutorial da Ellie)
               </Label>
               <Input placeholder="Ex: 987654321" value={canalRegras} onChange={(e) => setCanalRegras(e.target.value)} className="bg-background/40 border-border/40 text-xs h-8" />
             </div>
           </div>
 
-          <Button onClick={handleSetupDiscord} variant="outline" className="w-full font-display tracking-widest gap-2 border-primary/50 text-primary hover:bg-primary/10">
-            <Send className="h-4 w-4" /> MONTAR MENSAGEM FIXA DE RECEPÇÃO NO DISCORD
+          {/* O Botão agora tem quebra de linha permitida (whitespace-normal) e altura automática */}
+          <Button 
+            onClick={handleSetupDiscord} 
+            variant="outline" 
+            className="w-full font-display tracking-widest border-primary/50 text-primary hover:bg-primary/10 h-auto py-3 whitespace-normal leading-tight flex items-center justify-center gap-2 text-center"
+          >
+            <Send className="h-4 w-4 shrink-0" /> 
+            <span className="text-xs sm:text-sm">GERAR MENSAGEM DE RECEPÇÃO NO DISCORD</span>
           </Button>
         </div>
       </div>
@@ -132,12 +166,12 @@ const ReceptionTab = () => {
         <div className="space-y-6">
           <div>
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 block text-primary">TELA 1: POR QUE USAMOS O DISCORD?</Label>
-            <p className="text-[10px] text-muted-foreground mb-2">A Ellie já saudará o recruta pelo nome. Descreva abaixo por que a aliança exige o Discord.</p>
+            <p className="text-[10px] text-muted-foreground mb-2">A Ellie saudará o recruta pelo nome. Descreva abaixo por que a aliança exige o Discord.</p>
             <textarea 
               value={tutorialTela1} 
               onChange={(e) => setTutorialTela1(e.target.value)} 
-              placeholder="Ex: O chat do jogo é fraco e apaga coordenadas. Usamos o Discord para nos organizar militarmente..." 
-              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50" 
+              placeholder="Ex: O chat do jogo é fraco e apaga coordenadas. Nós usamos o Discord porque aqui é o nosso verdadeiro Quartel General..." 
+              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50 resize-y" 
             />
           </div>
 
@@ -147,24 +181,23 @@ const ReceptionTab = () => {
             <textarea 
               value={tutorialTela2} 
               onChange={(e) => setTutorialTela2(e.target.value)} 
-              placeholder="Ex: Respeite o NAP. Não ataque alianças aliadas! Leia o Quadro de Guerra antes de agir..." 
-              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50" 
+              placeholder="Ex: Para sobreviver, você precisa saber o que é NAP. Não ataque alianças aliadas e leia o Quadro de Guerra antes de agir..." 
+              className="flex min-h-[100px] w-full rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-sm text-foreground focus-visible:ring-primary/50 resize-y" 
             />
           </div>
 
-          <div className="text-[11px] text-muted-foreground/60 border-t border-border/20 pt-4 mt-2">
-            * Nota: A Tela 3 (Sobre a Ellie/Tradução) e a Tela 4 (Acesso à Academia LSS) são geradas automaticamente pelo sistema, pois descrevem as funções vitais da inteligência artificial.
+          <div className="text-[11px] text-muted-foreground/60 border-t border-border/20 pt-4 mt-2 leading-relaxed">
+            * Nota: A <strong>Tela 3</strong> (História da Ellie e Tradução Globais) e a <strong>Tela 4</strong> (Acesso à Academia LSS) são geradas automaticamente pelo sistema, pois descrevem as funções vitais da inteligência artificial e não podem ser alteradas.
           </div>
         </div>
       </div>
 
-      <Button onClick={handleSave} disabled={saving} className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 w-full sm:w-auto">
+      <Button onClick={handleSave} disabled={saving} className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 w-full sm:w-auto h-12">
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-        {saving ? "SALVANDO MÓDULO..." : "SALVAR ROTEIRO"}
+        {saving ? "SALVANDO ROTEIRO..." : "SALVAR ROTEIRO"}
       </Button>
     </div>
   );
 };
 
 export default ReceptionTab;
-        
