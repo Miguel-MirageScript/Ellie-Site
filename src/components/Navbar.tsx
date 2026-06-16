@@ -18,6 +18,7 @@ const Navbar = () => {
 
   // Sistema de Radar: Verifica continuamente se o Comandante está logado
   useEffect(() => {
+    if (!supabase) return;
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -32,6 +33,7 @@ const Navbar = () => {
   }, []);
 
   const handleDiscordLogin = async () => {
+    if (!supabase) return;
     if (!session) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'discord',
