@@ -76,7 +76,7 @@ const HeroSection = () => {
         </div>
 
         <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-md shadow-[0_0_20px_hsl(30_95%_50%_/_0.15)]">
-          <Icon icon="mdi:shield-half-full" className="h-4 w-4 text-primary" />
+          <Icon icon="mdi:biohazard" className="h-4 w-4 text-primary" />
           <span className="text-xs font-display tracking-widest text-primary uppercase">
             {t("hero.badge")}
           </span>
