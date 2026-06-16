@@ -13,12 +13,12 @@ const FeaturesSection = () => {
 
   const features = [
     {
-      icon: "mdi:translate-variant",
+      icon: "mdi:radio-tower",
       titleKey: "features.translate.title",
       descKey: "features.translate.desc",
     },
     {
-      icon: "mdi:bullhorn-variant-outline",
+      icon: "mdi:bullhorn-variant",
       titleKey: "features.ann.title",
       descKey: "features.ann.desc",
     },
@@ -28,7 +28,7 @@ const FeaturesSection = () => {
       descKey: "features.mod.desc",
     },
     {
-      icon: "mdi:gamepad-variant",
+      icon: "mdi:crosshairs-gps",
       titleKey: "features.multi.title",
       descKey: "features.multi.desc",
     },
