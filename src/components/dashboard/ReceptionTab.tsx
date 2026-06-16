@@ -66,7 +66,7 @@ const ReceptionTab = () => {
     }
     try {
       await supabase.from("configuracoes_servidor").update({ trigger_setup_recepcao: true }).eq("id_servidor", SERVER_ID);
-      toast({ title: "🚀 COMANDO ENVIADO!", description: "A Ellie vai montar a Guarita de Recepção no Discord em instantes." });
+      toast({ title: "🚀 COMANDO ENVIADO!", description: "A Duck vai montar a Guarita de Recepção no Discord em instantes." });
     } catch (err) {
       toast({ title: "Erro ao enviar comando", variant: "destructive" });
     }
@@ -85,7 +85,7 @@ const ReceptionTab = () => {
 
       <div className="text-[11px] text-muted-foreground bg-primary/5 border border-primary/20 rounded p-4 mb-4">
         <strong className="text-primary font-display tracking-widest block mb-2 underline underline-offset-2">BRIEFING TÁTICO:</strong>
-        Este sistema criará um canal blindado onde novatos e veteranos serão filtrados. A Ellie dará o tutorial interativo em mensagens fantasmas (invisíveis para os outros) antes de liberar o acesso à Base.
+        Este sistema criará um canal blindado onde novatos e veteranos serão filtrados. A Duck dará o tutorial interativo em mensagens fantasmas (invisíveis para os outros) antes de liberar o acesso à Base.
         
         <button 
           onClick={() => setShowDetails(!showDetails)} 
@@ -98,13 +98,13 @@ const ReceptionTab = () => {
 
         {showDetails && (
           <div className="mt-4 bg-black/50 border-2 border-dashed border-primary/40 p-5 rounded-lg space-y-3.5 text-xs leading-relaxed animate-in fade-in slide-in-from-top-3">
-            <p><strong className="text-primary font-bold">🚧 A Fronteira:</strong> O jogador entra no servidor e vê apenas uma mensagem fixa da Ellie: <em>"Identifique-se na guarita."</em> com botões de <strong>Novato</strong> e <strong>Veterano</strong>.</p>
-            <p><strong className="text-primary font-bold">⏩ ROTA 1 (Veterano):</strong> A Ellie envia uma mensagem fantasma dando as boas-vindas. Ensina o jogador a traduzir mensagens reagindo com a bandeira de seu país e pede para ele selecionar seu idioma. Ao escolher, o servidor se abre.</p>
-            <p><strong className="text-primary font-bold">🔰 ROTA 2 (Tutorial do Novato):</strong> A Ellie inicia o Briefing interativo em mensagens que só o jogador vê:</p>
+            <p><strong className="text-primary font-bold">🚧 A Fronteira:</strong> O jogador entra no servidor e vê apenas uma mensagem fixa do Duck: <em>"Identifique-se na guarita."</em> com botões de <strong>Novato</strong> e <strong>Veterano</strong>.</p>
+            <p><strong className="text-primary font-bold">⏩ ROTA 1 (Veterano):</strong> A Duck envia uma mensagem fantasma dando as boas-vindas. Ensina o jogador a traduzir mensagens reagindo com a bandeira de seu país e pede para ele selecionar seu idioma. Ao escolher, o servidor se abre.</p>
+            <p><strong className="text-primary font-bold">🔰 ROTA 2 (Tutorial do Novato):</strong> A Duck inicia o Briefing interativo em mensagens que só o jogador vê:</p>
             <ul className="list-disc pl-5 space-y-2 text-muted-foreground/90">
               <li><strong className="text-foreground font-semibold">Tela 1:</strong> Explica por que a aliança usa o Discord.</li>
               <li><strong className="text-foreground font-semibold">Tela 2:</strong> Ensina sobre sobrevivência, o que é NAP e menciona o Canal de Regras.</li>
-              <li><strong className="text-foreground font-semibold">Tela 3:</strong> A Ellie se apresenta como a Inteligência Artificial criada pelo veterano JIN WOO. Explica que sua função é tocar sirenes e traduzir o chat.</li>
+              <li><strong className="text-foreground font-semibold">Tela 3:</strong> A Duck se apresenta como a Inteligência Artificial criada pelo veterano JIN WOO. Explica que sua função é tocar sirenes e traduzir o chat.</li>
               <li><strong className="text-foreground font-semibold">Tela 4:</strong> Direciona o recruta para o Canal da Academia LSS.</li>
               <li><strong className="text-foreground font-semibold">Tela 5:</strong> O novato escolhe o idioma, ganha o crachá e o servidor é liberado!</li>
             </ul>
@@ -175,7 +175,7 @@ const ReceptionTab = () => {
         <div className="space-y-6">
           <div>
             <Label className="text-xs text-foreground font-display tracking-wider mb-2 block text-primary">TELA 1: POR QUE USAMOS O DISCORD?</Label>
-            <p className="text-[10px] text-muted-foreground mb-2">A Ellie saudará o recruta pelo nome. Descreva abaixo por que a aliança exige o Discord.</p>
+            <p className="text-[10px] text-muted-foreground mb-2">A Duck saudará o recruta pelo nome. Descreva abaixo por que a aliança exige o Discord.</p>
             <textarea 
               value={tutorialTela1} 
               onChange={(e) => setTutorialTela1(e.target.value)} 
@@ -196,7 +196,7 @@ const ReceptionTab = () => {
           </div>
 
           <div className="text-[11px] text-muted-foreground/60 border-t border-border/20 pt-4 mt-2 leading-relaxed">
-            * Nota: A <strong>Tela 3</strong> (Lore da Ellie/Traduções) e a <strong>Tela 4</strong> (Academia LSS) são geradas automaticamente pelo sistema.
+            * Nota: A <strong>Tela 3</strong> (Lore do Duck/Traduções) e a <strong>Tela 4</strong> (Academia LSS) são geradas automaticamente pelo sistema.
           </div>
         </div>
       </div>

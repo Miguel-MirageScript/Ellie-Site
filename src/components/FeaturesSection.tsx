@@ -1,40 +1,38 @@
 import { useEffect, useRef } from "react";
-import { Languages, Megaphone, ShieldCheck, Gamepad2 } from "lucide-react";
+import { Icon } from "@iconify/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLang } from "@/i18n/LanguageContext";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const features = [
-  {
-    icon: Languages,
-    title: "Tradução por Reação",
-    description:
-      "Traduza mensagens automaticamente reagindo com a bandeira do idioma desejado. Suporte para Português, Inglês, Espanhol, Russo e muito mais.",
-  },
-  {
-    icon: Megaphone,
-    title: "Anúncios Dinâmicos",
-    description:
-      "Crie e envie embeds de anúncios personalizados diretamente nos canais configurados. Mantenha seu servidor sempre atualizado.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Moderação Avançada",
-    description:
-      "Sistema completo de moderação com filtros automáticos, avisos, banimentos e logs detalhados para manter a ordem no servidor.",
-  },
-  {
-    icon: Gamepad2,
-    title: "Multi-Jogo",
-    description:
-      "Projetado para gerenciar servidores de Last Shelter Survival, FPS, Estratégia e Sobrevivência. Um bot para todos os seus jogos.",
-  },
-];
 
 const FeaturesSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
+  const { t } = useLang();
+
+  const features = [
+    {
+      icon: "mdi:translate-variant",
+      titleKey: "features.translate.title",
+      descKey: "features.translate.desc",
+    },
+    {
+      icon: "mdi:bullhorn-variant-outline",
+      titleKey: "features.ann.title",
+      descKey: "features.ann.desc",
+    },
+    {
+      icon: "mdi:shield-sword",
+      titleKey: "features.mod.title",
+      descKey: "features.mod.desc",
+    },
+    {
+      icon: "mdi:gamepad-variant",
+      titleKey: "features.multi.title",
+      descKey: "features.multi.desc",
+    },
+  ];
 
   useEffect(() => {
     cardsRef.current.forEach((card, i) => {
@@ -63,10 +61,10 @@ const FeaturesSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            RECURSOS <span className="text-gradient-ember">PODEROSOS</span>
+            {t("features.heading1")} <span className="text-gradient-ember">{t("features.heading2")}</span>
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            Tudo que você precisa para gerenciar seus servidores de jogos em um único bot.
+            {t("features.subtitle")}
           </p>
           <div className="section-divider mt-8 mx-auto max-w-xs" />
         </div>
@@ -74,20 +72,20 @@ const FeaturesSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {features.map((feature, i) => (
             <div
-              key={feature.title}
+              key={feature.titleKey}
               ref={(el) => { if (el) cardsRef.current[i] = el; }}
-              className="card-apocalyptic p-8 group hover:border-primary/30 transition-all duration-500"
+              className="card-apocalyptic p-8 group hover:border-primary/40 hover:-translate-y-1 transition-all duration-500 backdrop-blur-sm"
             >
               <div className="flex items-start gap-5">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
-                  <feature.icon className="h-6 w-6 text-primary" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                  <Icon icon={feature.icon} className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold tracking-wide mb-2 text-foreground">
-                    {feature.title}
+                    {t(feature.titleKey)}
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {feature.description}
+                    {t(feature.descKey)}
                   </p>
                 </div>
               </div>

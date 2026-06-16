@@ -189,7 +189,7 @@ const Dashboard = () => {
       
       toast({ 
         title: "🚨 SIRENE ACIONADA!", 
-        description: "A Ellie está enviando o alerta de Cerco Zumbi no Discord agora mesmo.",
+        description: "A Duck está enviando o alerta de Cerco Zumbi no Discord agora mesmo.",
         variant: "destructive" 
       });
     } catch (err) {
@@ -204,9 +204,9 @@ const Dashboard = () => {
       setUploadingImage(true);
       const fileExt = file.name.split('.').pop();
       const fileName = `${SERVER_ID}_${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('ellie-images').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      const { error: uploadError } = await supabase.storage.from('duck-images').upload(fileName, file, { cacheControl: '3600', upsert: false });
       if (uploadError) throw uploadError;
-      const { data: { publicUrl } } = supabase.storage.from('ellie-images').getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from('duck-images').getPublicUrl(fileName);
       setWarBoardImagem(publicUrl);
       toast({ title: "📸 Imagem carregada!", description: "Link gerado com sucesso. Clique em 'Salvar Táticas' para enviar." });
     } catch (error) {

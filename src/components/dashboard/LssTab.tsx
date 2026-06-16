@@ -53,6 +53,8 @@ const ChannelInput = ({ value, onChange, placeholder = "Ex: 123456789012345678" 
 );
 
 interface LssTabProps {
+  cozChestReminder?: boolean; setCozChestReminder?: (v: boolean) => void;
+  killEventAlert?: boolean; setKillEventAlert?: (v: boolean) => void;
   doomsdayTargets: string; setDoomsdayTargets: (v: string) => void;
   safeZone: string; setSafeZone: (v: string) => void;
 
@@ -140,7 +142,7 @@ const LssTab = ({
         </div>
         <div className="space-y-4">
           <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
-            <ToggleRow label="Dicas Automáticas do CoZ" desc="Às 00:00 (LSS Time), a Ellie anuncia o evento do dia com dicas avançadas." checked={cozAtivo} onChange={setCozAtivo} />
+            <ToggleRow label="Dicas Automáticas do CoZ" desc="Às 00:00 (LSS Time), o Duck anuncia o evento do dia com dicas avançadas." checked={cozAtivo} onChange={setCozAtivo} />
             {cozAtivo && <ChannelInput value={canalCoz} onChange={setCanalCoz} placeholder="ID do canal de dicas do CoZ" />}
           </div>
           <div className="bg-muted/5 p-4 rounded-lg border border-border/20">
@@ -217,7 +219,7 @@ const LssTab = ({
                     onChange={(e) => setSiegeHorario(e.target.value)} 
                     className="bg-background border-primary/30 text-foreground w-full sm:w-1/2 font-mono text-sm" 
                   />
-                  <p className="text-[10px] text-muted-foreground mt-1">A Ellie enviará um aviso 30 minutos antes do horário selecionado.</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">A Duck enviará um aviso 30 minutos antes do horário selecionado.</p>
                 </div>
                 
                 <div className="pt-2 pb-1">
@@ -240,7 +242,7 @@ const LssTab = ({
               onChange={(e) => setBalrogHorario(e.target.value)} 
               className="bg-background border-border/60 text-foreground w-full sm:w-1/2 font-mono text-sm" 
             />
-            <p className="text-[10px] text-muted-foreground mt-1">A Ellie enviará avisos faltando 1 Hora e 15 Minutos para o evento.</p>
+            <p className="text-[10px] text-muted-foreground mt-1">A Duck enviará avisos faltando 1 Hora e 15 Minutos para o evento.</p>
             <ChannelInput value={canalBalrog} onChange={setCanalBalrog} placeholder="ID do canal do Balrog" />
           </div>
 

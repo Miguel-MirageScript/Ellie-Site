@@ -3,31 +3,12 @@ import { gsap } from "gsap";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EmberParticles from "@/components/EmberParticles";
-
-const loreLines = [
-  "> INICIALIZANDO SISTEMA...",
-  "> CARREGANDO MEMÓRIA PRINCIPAL...",
-  "> ARQUIVO ENCONTRADO: ELLIE_SURVIVOR.log",
-  "",
-  "Nascida das cinzas da velha internet, Ellie foi programada para proteger as últimas Safe Zones — os servidores.",
-  "",
-  "Quando o caos tomou conta das comunidades, quando trolls, spammers e a desordem ameaçaram destruir tudo o que restava...",
-  "",
-  "Ela se ergueu.",
-  "",
-  "Como a inteligência definitiva para organizar, traduzir e defender sobreviventes de todo o mundo.",
-  "",
-  "Ellie não é apenas um bot. Ela é uma guardiã digital, forjada no fogo da necessidade, temperada pela experiência de milhares de servidores.",
-  "",
-  "Sua missão? Garantir que nenhuma comunidade caia. Que toda voz seja ouvida, independente do idioma. Que a ordem prevaleça sobre o caos.",
-  "",
-  "> STATUS: OPERACIONAL",
-  "> MISSÃO: PROTEGER AS SAFE ZONES",
-  "> ELLIE SURVIVOR — ONLINE",
-];
+import { useLang } from "@/i18n/LanguageContext";
 
 const Sobre = () => {
   const linesRef = useRef<(HTMLParagraphElement | null)[]>([]);
+  const { t, tArray, lang } = useLang();
+  const loreLines = tArray("sobre.lore");
 
   useEffect(() => {
     linesRef.current.forEach((el, i) => {
@@ -39,12 +20,12 @@ const Sobre = () => {
           opacity: 1,
           y: 0,
           duration: 0.4,
-          delay: i * 0.15,
+          delay: i * 0.1,
           ease: "power2.out",
         }
       );
     });
-  }, []);
+  }, [lang]);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -54,7 +35,7 @@ const Sobre = () => {
       <div className="relative z-10 pt-32 pb-20">
         <div className="container mx-auto px-4 max-w-3xl">
           <h1 className="font-display text-3xl md:text-5xl font-bold tracking-wider mb-4 text-foreground text-center">
-            A HISTÓRIA DE <span className="text-gradient-ember">ELLIE</span>
+            {t("sobre.title1")} <span className="text-gradient-ember">{t("sobre.title2")}</span>
           </h1>
           <div className="section-divider mb-12" />
 
@@ -62,7 +43,7 @@ const Sobre = () => {
             <div className="font-mono text-sm md:text-base leading-relaxed space-y-1">
               {loreLines.map((line, i) => (
                 <p
-                  key={i}
+                  key={`${lang}-${i}`}
                   ref={(el) => { linesRef.current[i] = el; }}
                   className={`opacity-0 ${
                     line.startsWith(">")
