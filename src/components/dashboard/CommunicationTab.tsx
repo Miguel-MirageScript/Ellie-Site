@@ -8,7 +8,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-// 🌍 Dicionário Mestre de Idiomas da Ellie
+// 🌍 Dicionário Mestre de Idiomas do Duck
 export const AVAILABLE_LANGUAGES = [
   { id: "pt", name: "Português", emoji: "🇧🇷" },
   { id: "en", name: "English", emoji: "🇺🇸" },
@@ -73,7 +73,7 @@ const CommunicationTab = ({
             CENTRAL DE IDIOMAS DA ALIANÇA
           </h3>
           <p className="text-xs text-muted-foreground mt-2">
-            Ative um idioma abaixo. A Ellie irá criar o cargo no Discord e habilitar a tradução por reação automaticamente.
+            Ative um idioma abaixo. A Duck irá criar o cargo no Discord e habilitar a tradução por reação automaticamente.
           </p>
         </div>
         <div className="text-left sm:text-right bg-muted/20 px-4 py-2 rounded-md border border-border/40">
