@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
-import { Search, Shield, Wrench, Gamepad2, Gavel, ChevronDown, ChevronUp } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EmberParticles from "@/components/EmberParticles";
+import { useLang } from "@/i18n/LanguageContext";
 
 interface Command {
   name: string;
@@ -13,16 +14,16 @@ interface Command {
 
 interface Category {
   key: string;
-  label: string;
-  icon: React.ReactNode;
+  labelKey: string;
+  icon: string;
   commands: Command[];
 }
 
 const categories: Category[] = [
   {
     key: "admin",
-    label: "Administração",
-    icon: <Shield className="h-5 w-5" />,
+    labelKey: "commands.cat.admin",
+    icon: "mdi:shield-crown",
     commands: [
       { name: "/config", description: "Abre o painel de configuração do servidor.", usage: "/config" },
       { name: "/setlang", description: "Define o idioma padrão do servidor.", usage: "/setlang [idioma]" },
@@ -32,8 +33,8 @@ const categories: Category[] = [
   },
   {
     key: "utils",
-    label: "Utilitários",
-    icon: <Wrench className="h-5 w-5" />,
+    labelKey: "commands.cat.utils",
+    icon: "mdi:wrench-cog",
     commands: [
       { name: "/translate", description: "Traduz uma mensagem para o idioma selecionado.", usage: "/translate [idioma] [texto]" },
       { name: "/serverinfo", description: "Mostra informações detalhadas do servidor.", usage: "/serverinfo" },
@@ -43,8 +44,8 @@ const categories: Category[] = [
   },
   {
     key: "fun",
-    label: "Diversão",
-    icon: <Gamepad2 className="h-5 w-5" />,
+    labelKey: "commands.cat.fun",
+    icon: "mdi:gamepad-variant",
     commands: [
       { name: "/roll", description: "Rola um dado com o número de lados especificado.", usage: "/roll [lados]" },
       { name: "/meme", description: "Envia um meme aleatório no chat.", usage: "/meme" },
@@ -54,8 +55,8 @@ const categories: Category[] = [
   },
   {
     key: "mod",
-    label: "Moderação",
-    icon: <Gavel className="h-5 w-5" />,
+    labelKey: "commands.cat.mod",
+    icon: "mdi:gavel",
     commands: [
       { name: "/ban", description: "Bane um usuário do servidor.", usage: "/ban @usuário [motivo]" },
       { name: "/kick", description: "Expulsa um usuário do servidor.", usage: "/kick @usuário [motivo]" },
@@ -71,6 +72,7 @@ const Comandos = () => {
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
     Object.fromEntries(categories.map((c) => [c.key, true]))
   );
+  const { t } = useLang();
 
   const filtered = useMemo(() => {
     if (!search.trim()) return categories;
@@ -98,20 +100,20 @@ const Comandos = () => {
       <div className="relative z-10 pt-32 pb-20">
         <div className="container mx-auto px-4 max-w-4xl">
           <h1 className="font-display text-3xl md:text-5xl font-bold tracking-wider mb-4 text-foreground text-center">
-            LISTA DE <span className="text-gradient-ember">COMANDOS</span>
+            {t("commands.title1")} <span className="text-gradient-ember">{t("commands.title2")}</span>
           </h1>
           <p className="text-center text-muted-foreground text-sm mb-8">
-            Todos os comandos disponíveis na Ellie Survivor.
+            {t("commands.subtitle")}
           </p>
 
           {/* Search */}
           <div className="relative max-w-md mx-auto mb-12">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Icon icon="mdi:magnify" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar comando..."
+              placeholder={t("commands.search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-muted border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary/50"
+              className="pl-10 bg-muted/60 backdrop-blur-sm border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary/50"
             />
           </div>
 
@@ -121,22 +123,21 @@ const Comandos = () => {
               <div key={cat.key} className="card-apocalyptic bg-background/60 backdrop-blur-md border-border/50">
                 <button
                   onClick={() => toggle(cat.key)}
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left hover:bg-primary/5 transition-colors duration-300"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-primary">{cat.icon}</span>
+                    <Icon icon={cat.icon} className="h-5 w-5 text-primary" />
                     <span className="font-display text-sm font-semibold tracking-wider text-foreground">
-                      {cat.label.toUpperCase()}
+                      {t(cat.labelKey).toUpperCase()}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       ({cat.commands.length})
                     </span>
                   </div>
-                  {openCategories[cat.key] ? (
-                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  )}
+                  <Icon
+                    icon="mdi:chevron-down"
+                    className={`h-4 w-4 text-muted-foreground transition-transform duration-300 ${openCategories[cat.key] ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {openCategories[cat.key] && (
@@ -144,7 +145,7 @@ const Comandos = () => {
                     {cat.commands.map((cmd) => (
                       <div
                         key={cmd.name}
-                        className="rounded-lg border border-border/50 bg-muted/30 p-4 hover:border-primary/30 transition-colors"
+                        className="rounded-lg border border-border/50 bg-muted/30 p-4 hover:border-primary/40 hover:bg-muted/50 transition-all duration-300"
                       >
                         <code className="text-primary font-mono text-sm font-semibold">
                           {cmd.name}
@@ -164,7 +165,7 @@ const Comandos = () => {
 
             {filtered.length === 0 && (
               <p className="text-center text-muted-foreground text-sm py-12">
-                Nenhum comando encontrado para "{search}".
+                {t("commands.empty")} "{search}"
               </p>
             )}
           </div>

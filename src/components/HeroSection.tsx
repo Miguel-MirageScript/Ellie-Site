@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { Shield, Zap, ChevronDown } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import gsap from "gsap";
 import heroBg from "@/assets/hero-bg.jpg";
 import ellieProfile from "@/assets/ellie-profile.png";
+import { useLang } from "@/i18n/LanguageContext";
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -13,11 +13,12 @@ const HeroSection = () => {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const { t } = useLang();
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    tl.fromTo(avatarRef.current, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8 })
+    tl.fromTo(avatarRef.current, { scale: 0.85, opacity: 0, y: 20 }, { scale: 1, opacity: 1, y: 0, duration: 0.9 })
       .fromTo(badgeRef.current, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, "-=0.4")
       .fromTo(titleRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, "-=0.3")
       .fromTo(subtitleRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, "-=0.4")
@@ -25,7 +26,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -37,54 +38,72 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
       </div>
 
+      {/* Subtle tactical grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(hsl(30 95% 50% / 0.5) 1px, transparent 1px), linear-gradient(90deg, hsl(30 95% 50% / 0.5) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+        }}
+      />
+
       {/* Content */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl">
-        {/* Ellie Profile Image - full portrait with edge fade */}
-        <div ref={avatarRef} className="relative mx-auto mb-6 w-64 md:w-80 lg:w-96">
-          <div className="absolute -inset-8 bg-gradient-to-b from-primary/10 via-transparent to-transparent blur-3xl pointer-events-none" />
+        {/* Duck Portrait - fully visible, blended with environment */}
+        <div ref={avatarRef} className="relative mx-auto mb-8 w-60 md:w-72 lg:w-80">
+          {/* Warm ambient glow behind */}
+          <div className="absolute -inset-10 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent blur-3xl pointer-events-none" />
+          {/* Ground fog plate */}
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[120%] h-24 bg-gradient-to-t from-background via-background/60 to-transparent blur-2xl pointer-events-none" />
+
           <img
             src={ellieProfile}
-            alt="Ellie Survivor"
-            className="relative w-full h-auto object-contain"
+            alt="Duck Survival"
+            className="relative w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
             style={{
-              maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-              maskComposite: "intersect",
-              WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
-              WebkitMaskComposite: "source-in",
+              filter: "contrast(1.05) saturate(0.95)",
+              maskImage:
+                "radial-gradient(ellipse 85% 95% at 50% 45%, black 55%, transparent 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 85% 95% at 50% 45%, black 55%, transparent 100%)",
             }}
           />
         </div>
 
-        <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm">
-          <Shield className="h-4 w-4 text-primary" />
+        <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-md shadow-[0_0_20px_hsl(30_95%_50%_/_0.15)]">
+          <Icon icon="mdi:shield-half-full" className="h-4 w-4 text-primary" />
           <span className="text-xs font-display tracking-widest text-primary uppercase">
-            Seu Bot de Gerenciamento para Servidores de Jogos
+            {t("hero.badge")}
           </span>
         </div>
 
         <h1 ref={titleRef} className="font-display text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6 leading-none">
-          <span className="text-foreground">ELLIE</span>
+          <span className="text-foreground">{t("hero.title1")}</span>
           <br />
-          <span className="text-gradient-ember">SURVIVOR</span>
+          <span className="text-gradient-ember">{t("hero.title2")}</span>
         </h1>
 
         <p ref={subtitleRef} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-          A solução definitiva para <span className="text-foreground font-semibold">moderação</span>,{" "}
-          <span className="text-foreground font-semibold">tradução</span> e{" "}
-          <span className="text-foreground font-semibold">anúncios</span> nos seus servidores de jogos.
-          Last Shelter Survival, FPS e Muito mais!
+          {t("hero.subtitle.intro")} <span className="text-foreground font-semibold">{t("hero.subtitle.mod")}</span>,{" "}
+          <span className="text-foreground font-semibold">{t("hero.subtitle.trans")}</span>{" "}
+          {t("hero.subtitle.intro").endsWith("for") || t("hero.subtitle.intro").endsWith("para") ? "&" : "&"}{" "}
+          <span className="text-foreground font-semibold">{t("hero.subtitle.ann")}</span>{" "}
+          {t("hero.subtitle.outro")}
         </p>
 
         <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="https://discord.com/oauth2/authorize?client_id=1481478930505666700&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener noreferrer">
-            <Button size="lg" className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 px-8 py-6 text-sm animate-pulse-glow">
-              <Zap className="h-5 w-5" />
-              ME ADICIONE!
+            <Button size="lg" className="glow-button bg-primary text-primary-foreground font-display tracking-wider gap-2 px-8 py-6 text-sm animate-pulse-glow hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200">
+              <Icon icon="mdi:lightning-bolt" className="h-5 w-5" />
+              {t("hero.cta.add")}
             </Button>
           </a>
           <a href="#recursos">
-            <Button size="lg" variant="outline" className="font-display tracking-wider gap-2 px-8 py-6 text-sm border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5">
-              SAIBA MAIS
+            <Button size="lg" variant="outline" className="font-display tracking-wider gap-2 px-8 py-6 text-sm border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
+              <Icon icon="mdi:radar" className="h-4 w-4" />
+              {t("hero.cta.learn")}
             </Button>
           </a>
         </div>
@@ -92,7 +111,7 @@ const HeroSection = () => {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
-        <ChevronDown className="h-6 w-6 text-muted-foreground" />
+        <Icon icon="mdi:chevron-down" className="h-6 w-6 text-muted-foreground" />
       </div>
     </section>
   );
