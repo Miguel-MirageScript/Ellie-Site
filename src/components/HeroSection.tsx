@@ -51,12 +51,10 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl">
-        {/* Duck Portrait - fully visible, blended with environment */}
+        {/* Duck Portrait - blended with environment, lower body dissolves into smoke */}
         <div ref={avatarRef} className="relative mx-auto mb-8 w-60 md:w-72 lg:w-80">
           {/* Warm ambient glow behind */}
           <div className="absolute -inset-10 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent blur-3xl pointer-events-none" />
-          {/* Ground fog plate */}
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[120%] h-24 bg-gradient-to-t from-background via-background/60 to-transparent blur-2xl pointer-events-none" />
 
           <img
             src={ellieProfile}
@@ -65,11 +63,16 @@ const HeroSection = () => {
             style={{
               filter: "contrast(1.05) saturate(0.95)",
               maskImage:
-                "radial-gradient(ellipse 85% 95% at 50% 45%, black 55%, transparent 100%)",
+                "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.85) 72%, rgba(0,0,0,0.35) 88%, transparent 100%)",
               WebkitMaskImage:
-                "radial-gradient(ellipse 85% 95% at 50% 45%, black 55%, transparent 100%)",
+                "linear-gradient(to bottom, black 0%, black 55%, rgba(0,0,0,0.85) 72%, rgba(0,0,0,0.35) 88%, transparent 100%)",
             }}
           />
+
+          {/* Smoke / vignette dissolving the lower body into the scenery */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="pointer-events-none absolute -bottom-10 left-1/2 -translate-x-1/2 w-[140%] h-32 bg-gradient-to-t from-background via-background/80 to-transparent blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-4 left-1/2 -translate-x-1/2 w-[85%] h-8 rounded-[50%] bg-black/60 blur-2xl" />
         </div>
 
         <div ref={badgeRef} className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-md shadow-[0_0_20px_hsl(30_95%_50%_/_0.15)]">
