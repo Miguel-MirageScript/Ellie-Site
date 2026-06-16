@@ -89,9 +89,9 @@ const HeroSection = () => {
         </h1>
 
         <p ref={subtitleRef} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-          {t("hero.subtitle.intro")} <span className="text-foreground font-semibold">{t("hero.subtitle.mod")}</span>,{" "}
-          <span className="text-foreground font-semibold">{t("hero.subtitle.trans")}</span>{" "}
-          {t("hero.subtitle.intro").endsWith("for") || t("hero.subtitle.intro").endsWith("para") ? "&" : "&"}{" "}
+          {t("hero.subtitle.intro")}{" "}
+          <span className="text-foreground font-semibold">{t("hero.subtitle.mod")}</span>,{" "}
+          <span className="text-foreground font-semibold">{t("hero.subtitle.trans")}</span>{" "}&{" "}
           <span className="text-foreground font-semibold">{t("hero.subtitle.ann")}</span>{" "}
           {t("hero.subtitle.outro")}
         </p>
