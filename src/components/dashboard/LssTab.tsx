@@ -53,6 +53,8 @@ const ChannelInput = ({ value, onChange, placeholder = "Ex: 123456789012345678" 
 );
 
 interface LssTabProps {
+  cozChestReminder?: boolean; setCozChestReminder?: (v: boolean) => void;
+  killEventAlert?: boolean; setKillEventAlert?: (v: boolean) => void;
   doomsdayTargets: string; setDoomsdayTargets: (v: string) => void;
   safeZone: string; setSafeZone: (v: string) => void;
 
